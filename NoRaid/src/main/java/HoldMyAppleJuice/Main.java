@@ -125,7 +125,7 @@ public class Main extends JavaPlugin implements Listener
     {
         Location loc = e.getPlayer().getLocation();
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-        RegionManager regions = container.get(BukkitAdapter.adapt(Bukkit.getWorld(WORLD_NAME)));
+        RegionManager regions = container.get(BukkitAdapter.adapt( Bukkit.getWorlds().get(0) ));
         Map<String, ProtectedRegion> regionMap = regions.getRegions();
         for (ProtectedRegion region : regionMap.values())
         {
