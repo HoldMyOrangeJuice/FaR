@@ -1,0 +1,7 @@
+name: NoRaid
+version: 1.0.0
+main: HoldMyAppleJuice.Main
+description: added no-raid flag for region
+author: HoldMyAppleJuice
+depend:
+  - WorldGuard
