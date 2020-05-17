@@ -10,6 +10,7 @@ Trader:
       - flag npc "inv_title:This is trader GUI!"
       - flag npc "trader_name:Trader"
       - flag npc "trader_mode:buy"
+      - flag npc "edit_mode:false"
 
       # repetitive flags:
       - define slot 1
@@ -63,13 +64,29 @@ Trader_GUI:
               - define lorelist_<def[slot]> <list[<def[LORE_1_DEFINITION_<def[slot]>]>|<def[LORE_2_DEFINITION_<def[slot]>]>]>
           - else:
               - define lorelist_<def[slot]> <list[<def[LORE_1_DEFINITION_<def[slot]>]>]>
+
+
+      - flag npc display_i_<def[slot]>:<npc.flag[material_<def[slot]>]>[lore=<def[lorelist_<def[slot]>]>]
+      #- narrate <def[display_i_<def[slot]>]>
       - define slot:+:1
 
-    - define list <list[<tern[<npc.flag[material_1].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_1]>[lore=<def[lorelist_1]>]]>|<tern[<npc.flag[material_2].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_2]>[lore=<def[lorelist_2]>]]>|<tern[<npc.flag[material_3].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_3]>[lore=<def[lorelist_3]>]]>|<tern[<npc.flag[material_4].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_4]>[lore=<def[lorelist_4]>]]>|<tern[<npc.flag[material_5].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_5]>[lore=<def[lorelist_5]>]]>|<tern[<npc.flag[material_6].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_6]>[lore=<def[lorelist_6]>]]>|<tern[<npc.flag[material_7].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_7]>[lore=<def[lorelist_7]>]]>|<tern[<npc.flag[material_8].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_8]>[lore=<def[lorelist_8]>]]>|<tern[<npc.flag[material_9].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_9]>[lore=<def[lorelist_9]>]]>|<tern[<npc.flag[material_10].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_10]>[lore=<def[lorelist_10]>]]>|<tern[<npc.flag[material_11].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_11]>[lore=<def[lorelist_11]>]]>|<tern[<npc.flag[material_12].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_12]>[lore=<def[lorelist_12]>]]>|<tern[<npc.flag[material_13].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_13]>[lore=<def[lorelist_13]>]]>|<tern[<npc.flag[material_14].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_14]>[lore=<def[lorelist_14]>]]>|<tern[<npc.flag[material_15].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_15]>[lore=<def[lorelist_15]>]]>|<tern[<npc.flag[material_16].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_16]>[lore=<def[lorelist_16]>]]>|<tern[<npc.flag[material_17].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_17]>[lore=<def[lorelist_17]>]]>|<tern[<npc.flag[material_18].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_18]>[lore=<def[lorelist_18]>]]>|<tern[<npc.flag[material_19].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_19]>[lore=<def[lorelist_19]>]]>|<tern[<npc.flag[material_20].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_20]>[lore=<def[lorelist_20]>]]>|<tern[<npc.flag[material_21].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_21]>[lore=<def[lorelist_21]>]]>|<tern[<npc.flag[material_22].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_22]>[lore=<def[lorelist_22]>]]>|<tern[<npc.flag[material_23].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_23]>[lore=<def[lorelist_23]>]]>|<tern[<npc.flag[material_24].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_24]>[lore=<def[lorelist_24]>]]>|<tern[<npc.flag[material_25].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_25]>[lore=<def[lorelist_25]>]]>|<tern[<npc.flag[material_26].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_26]>[lore=<def[lorelist_26]>]]>|<tern[<npc.flag[material_27].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_27]>[lore=<def[lorelist_27]>]]>|<tern[<npc.flag[material_28].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_28]>[lore=<def[lorelist_28]>]]>|<tern[<npc.flag[material_29].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_29]>[lore=<def[lorelist_29]>]]>|<tern[<npc.flag[material_30].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_30]>[lore=<def[lorelist_30]>]]>|<tern[<npc.flag[material_31].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_31]>[lore=<def[lorelist_31]>]]>|<tern[<npc.flag[material_32].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_32]>[lore=<def[lorelist_32]>]]>|<tern[<npc.flag[material_33].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_33]>[lore=<def[lorelist_33]>]]>|<tern[<npc.flag[material_34].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_34]>[lore=<def[lorelist_34]>]]>|<tern[<npc.flag[material_35].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_35]>[lore=<def[lorelist_35]>]]>|<tern[<npc.flag[material_36].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_36]>[lore=<def[lorelist_36]>]]>|<tern[<npc.flag[material_37].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_37]>[lore=<def[lorelist_37]>]]>|<tern[<npc.flag[material_38].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_38]>[lore=<def[lorelist_38]>]]>|<tern[<npc.flag[material_39].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_39]>[lore=<def[lorelist_39]>]]>|<tern[<npc.flag[material_40].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_40]>[lore=<def[lorelist_40]>]]>|<tern[<npc.flag[material_41].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_41]>[lore=<def[lorelist_41]>]]>|<tern[<npc.flag[material_42].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_42]>[lore=<def[lorelist_42]>]]>|<tern[<npc.flag[material_43].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_43]>[lore=<def[lorelist_43]>]]>|<tern[<npc.flag[material_44].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_44]>[lore=<def[lorelist_44]>]]>|<tern[<npc.flag[material_45].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_45]>[lore=<def[lorelist_45]>]]>|<tern[<npc.flag[material_46].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_46]>[lore=<def[lorelist_46]>]]>|<tern[<npc.flag[material_47].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_47]>[lore=<def[lorelist_47]>]]>|<tern[<npc.flag[material_48].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_48]>[lore=<def[lorelist_48]>]]>|<tern[<npc.flag[material_49].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_49]>[lore=<def[lorelist_49]>]]>|<tern[<npc.flag[material_50].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_50]>[lore=<def[lorelist_50]>]]>|<tern[<npc.flag[material_51].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_51]>[lore=<def[lorelist_51]>]]>|<tern[<npc.flag[material_52].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_52]>[lore=<def[lorelist_52]>]]>|<tern[<npc.flag[material_53].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_53]>[lore=<def[lorelist_53]>]]>|<tern[<npc.flag[material_54].is[==].to[air]>].pass[light_gray_stained_glass_pane[display_name=<&co>]].fail[<npc.flag[material_54]>[lore=<def[lorelist_54]>]]>]>
+    - define list <list[<tern[<npc.flag[material_1].is[==].to[air]>].pass[air].fail[<npc.flag[material_1]>[lore=<def[lorelist_1]>]]>|<tern[<npc.flag[material_2].is[==].to[air]>].pass[air].fail[<npc.flag[material_2]>[lore=<def[lorelist_2]>]]>|<tern[<npc.flag[material_3].is[==].to[air]>].pass[air].fail[<npc.flag[material_3]>[lore=<def[lorelist_3]>]]>|<tern[<npc.flag[material_4].is[==].to[air]>].pass[air].fail[<npc.flag[material_4]>[lore=<def[lorelist_4]>]]>|<tern[<npc.flag[material_5].is[==].to[air]>].pass[air].fail[<npc.flag[material_5]>[lore=<def[lorelist_5]>]]>|<tern[<npc.flag[material_6].is[==].to[air]>].pass[air].fail[<npc.flag[material_6]>[lore=<def[lorelist_6]>]]>|<tern[<npc.flag[material_7].is[==].to[air]>].pass[air].fail[<npc.flag[material_7]>[lore=<def[lorelist_7]>]]>|<tern[<npc.flag[material_8].is[==].to[air]>].pass[air].fail[<npc.flag[material_8]>[lore=<def[lorelist_8]>]]>|<tern[<npc.flag[material_9].is[==].to[air]>].pass[air].fail[<npc.flag[material_9]>[lore=<def[lorelist_9]>]]>|<tern[<npc.flag[material_10].is[==].to[air]>].pass[air].fail[<npc.flag[material_10]>[lore=<def[lorelist_10]>]]>|<tern[<npc.flag[material_11].is[==].to[air]>].pass[air].fail[<npc.flag[material_11]>[lore=<def[lorelist_11]>]]>|<tern[<npc.flag[material_12].is[==].to[air]>].pass[air].fail[<npc.flag[material_12]>[lore=<def[lorelist_12]>]]>|<tern[<npc.flag[material_13].is[==].to[air]>].pass[air].fail[<npc.flag[material_13]>[lore=<def[lorelist_13]>]]>|<tern[<npc.flag[material_14].is[==].to[air]>].pass[air].fail[<npc.flag[material_14]>[lore=<def[lorelist_14]>]]>|<tern[<npc.flag[material_15].is[==].to[air]>].pass[air].fail[<npc.flag[material_15]>[lore=<def[lorelist_15]>]]>|<tern[<npc.flag[material_16].is[==].to[air]>].pass[air].fail[<npc.flag[material_16]>[lore=<def[lorelist_16]>]]>|<tern[<npc.flag[material_17].is[==].to[air]>].pass[air].fail[<npc.flag[material_17]>[lore=<def[lorelist_17]>]]>|<tern[<npc.flag[material_18].is[==].to[air]>].pass[air].fail[<npc.flag[material_18]>[lore=<def[lorelist_18]>]]>|<tern[<npc.flag[material_19].is[==].to[air]>].pass[air].fail[<npc.flag[material_19]>[lore=<def[lorelist_19]>]]>|<tern[<npc.flag[material_20].is[==].to[air]>].pass[air].fail[<npc.flag[material_20]>[lore=<def[lorelist_20]>]]>|<tern[<npc.flag[material_21].is[==].to[air]>].pass[air].fail[<npc.flag[material_21]>[lore=<def[lorelist_21]>]]>|<tern[<npc.flag[material_22].is[==].to[air]>].pass[air].fail[<npc.flag[material_22]>[lore=<def[lorelist_22]>]]>|<tern[<npc.flag[material_23].is[==].to[air]>].pass[air].fail[<npc.flag[material_23]>[lore=<def[lorelist_23]>]]>|<tern[<npc.flag[material_24].is[==].to[air]>].pass[air].fail[<npc.flag[material_24]>[lore=<def[lorelist_24]>]]>|<tern[<npc.flag[material_25].is[==].to[air]>].pass[air].fail[<npc.flag[material_25]>[lore=<def[lorelist_25]>]]>|<tern[<npc.flag[material_26].is[==].to[air]>].pass[air].fail[<npc.flag[material_26]>[lore=<def[lorelist_26]>]]>|<tern[<npc.flag[material_27].is[==].to[air]>].pass[air].fail[<npc.flag[material_27]>[lore=<def[lorelist_27]>]]>|<tern[<npc.flag[material_28].is[==].to[air]>].pass[air].fail[<npc.flag[material_28]>[lore=<def[lorelist_28]>]]>|<tern[<npc.flag[material_29].is[==].to[air]>].pass[air].fail[<npc.flag[material_29]>[lore=<def[lorelist_29]>]]>|<tern[<npc.flag[material_30].is[==].to[air]>].pass[air].fail[<npc.flag[material_30]>[lore=<def[lorelist_30]>]]>|<tern[<npc.flag[material_31].is[==].to[air]>].pass[air].fail[<npc.flag[material_31]>[lore=<def[lorelist_31]>]]>|<tern[<npc.flag[material_32].is[==].to[air]>].pass[air].fail[<npc.flag[material_32]>[lore=<def[lorelist_32]>]]>|<tern[<npc.flag[material_33].is[==].to[air]>].pass[air].fail[<npc.flag[material_33]>[lore=<def[lorelist_33]>]]>|<tern[<npc.flag[material_34].is[==].to[air]>].pass[air].fail[<npc.flag[material_34]>[lore=<def[lorelist_34]>]]>|<tern[<npc.flag[material_35].is[==].to[air]>].pass[air].fail[<npc.flag[material_35]>[lore=<def[lorelist_35]>]]>|<tern[<npc.flag[material_36].is[==].to[air]>].pass[air].fail[<npc.flag[material_36]>[lore=<def[lorelist_36]>]]>|<tern[<npc.flag[material_37].is[==].to[air]>].pass[air].fail[<npc.flag[material_37]>[lore=<def[lorelist_37]>]]>|<tern[<npc.flag[material_38].is[==].to[air]>].pass[air].fail[<npc.flag[material_38]>[lore=<def[lorelist_38]>]]>|<tern[<npc.flag[material_39].is[==].to[air]>].pass[air].fail[<npc.flag[material_39]>[lore=<def[lorelist_39]>]]>|<tern[<npc.flag[material_40].is[==].to[air]>].pass[air].fail[<npc.flag[material_40]>[lore=<def[lorelist_40]>]]>|<tern[<npc.flag[material_41].is[==].to[air]>].pass[air].fail[<npc.flag[material_41]>[lore=<def[lorelist_41]>]]>|<tern[<npc.flag[material_42].is[==].to[air]>].pass[air].fail[<npc.flag[material_42]>[lore=<def[lorelist_42]>]]>|<tern[<npc.flag[material_43].is[==].to[air]>].pass[air].fail[<npc.flag[material_43]>[lore=<def[lorelist_43]>]]>|<tern[<npc.flag[material_44].is[==].to[air]>].pass[air].fail[<npc.flag[material_44]>[lore=<def[lorelist_44]>]]>|<tern[<npc.flag[material_45].is[==].to[air]>].pass[air].fail[<npc.flag[material_45]>[lore=<def[lorelist_45]>]]>|<tern[<npc.flag[material_46].is[==].to[air]>].pass[air].fail[<npc.flag[material_46]>[lore=<def[lorelist_46]>]]>|<tern[<npc.flag[material_47].is[==].to[air]>].pass[air].fail[<npc.flag[material_47]>[lore=<def[lorelist_47]>]]>|<tern[<npc.flag[material_48].is[==].to[air]>].pass[air].fail[<npc.flag[material_48]>[lore=<def[lorelist_48]>]]>|<tern[<npc.flag[material_49].is[==].to[air]>].pass[air].fail[<npc.flag[material_49]>[lore=<def[lorelist_49]>]]>|<tern[<npc.flag[material_50].is[==].to[air]>].pass[air].fail[<npc.flag[material_50]>[lore=<def[lorelist_50]>]]>|<tern[<npc.flag[material_51].is[==].to[air]>].pass[air].fail[<npc.flag[material_51]>[lore=<def[lorelist_51]>]]>|<tern[<npc.flag[material_52].is[==].to[air]>].pass[air].fail[<npc.flag[material_52]>[lore=<def[lorelist_52]>]]>|<tern[<npc.flag[material_53].is[==].to[air]>].pass[air].fail[<npc.flag[material_53]>[lore=<def[lorelist_53]>]]>|<tern[<npc.flag[material_54].is[==].to[air]>].pass[air].fail[<npc.flag[material_54]>[lore=<def[lorelist_54]>]]>]>
+    #- define list <list[<npc.flag[material_1]>[lore=<def[lorelist_1]>]|<npc.flag[material_2]>[lore=<def[lorelist_2]>]|<npc.flag[material_3]>[lore=<def[lorelist_3]>]|<npc.flag[material_4]>[lore=<def[lorelist_4]>]|<npc.flag[material_5]>[lore=<def[lorelist_5]>]|<npc.flag[material_6]>[lore=<def[lorelist_6]>]|<npc.flag[material_7]>[lore=<def[lorelist_7]>]|<npc.flag[material_8]>[lore=<def[lorelist_8]>]|<npc.flag[material_9]>[lore=<def[lorelist_9]>]|<npc.flag[material_10]>[lore=<def[lorelist_10]>]|<npc.flag[material_11]>[lore=<def[lorelist_11]>]|<npc.flag[material_12]>[lore=<def[lorelist_12]>]|<npc.flag[material_13]>[lore=<def[lorelist_13]>]|<npc.flag[material_14]>[lore=<def[lorelist_14]>]|<npc.flag[material_15]>[lore=<def[lorelist_15]>]|<npc.flag[material_16]>[lore=<def[lorelist_16]>]|<npc.flag[material_17]>[lore=<def[lorelist_17]>]|<npc.flag[material_18]>[lore=<def[lorelist_18]>]|<npc.flag[material_19]>[lore=<def[lorelist_19]>]|<npc.flag[material_20]>[lore=<def[lorelist_20]>]|<npc.flag[material_21]>[lore=<def[lorelist_21]>]|<npc.flag[material_22]>[lore=<def[lorelist_22]>]|<npc.flag[material_23]>[lore=<def[lorelist_23]>]|<npc.flag[material_24]>[lore=<def[lorelist_24]>]|<npc.flag[material_25]>[lore=<def[lorelist_25]>]|<npc.flag[material_26]>[lore=<def[lorelist_26]>]|<npc.flag[material_27]>[lore=<def[lorelist_27]>]|<npc.flag[material_28]>[lore=<def[lorelist_28]>]|<npc.flag[material_29]>[lore=<def[lorelist_29]>]|<npc.flag[material_30]>[lore=<def[lorelist_30]>]|<npc.flag[material_31]>[lore=<def[lorelist_31]>]|<npc.flag[material_32]>[lore=<def[lorelist_32]>]|<npc.flag[material_33]>[lore=<def[lorelist_33]>]|<npc.flag[material_34]>[lore=<def[lorelist_34]>]|<npc.flag[material_35]>[lore=<def[lorelist_35]>]|<npc.flag[material_36]>[lore=<def[lorelist_36]>]|<npc.flag[material_37]>[lore=<def[lorelist_37]>]|<npc.flag[material_38]>[lore=<def[lorelist_38]>]|<npc.flag[material_39]>[lore=<def[lorelist_39]>]|<npc.flag[material_40]>[lore=<def[lorelist_40]>]|<npc.flag[material_41]>[lore=<def[lorelist_41]>]|<npc.flag[material_42]>[lore=<def[lorelist_42]>]|<npc.flag[material_43]>[lore=<def[lorelist_43]>]|<npc.flag[material_44]>[lore=<def[lorelist_44]>]|<npc.flag[material_45]>[lore=<def[lorelist_45]>]|<npc.flag[material_46]>[lore=<def[lorelist_46]>]|<npc.flag[material_47]>[lore=<def[lorelist_47]>]|<npc.flag[material_48]>[lore=<def[lorelist_48]>]|<npc.flag[material_49]>[lore=<def[lorelist_49]>]|<npc.flag[material_50]>[lore=<def[lorelist_50]>]|<npc.flag[material_51]>[lore=<def[lorelist_51]>]|<npc.flag[material_52]>[lore=<def[lorelist_52]>]|<npc.flag[material_53]>[lore=<def[lorelist_53]>]|<npc.flag[material_54]>[lore=<def[lorelist_54]>]]>
     - determine <[list]>
+    #- narrate <i@<npc.flag[material_1]>.with[lore=lorelist_1]>
+    #- narrate <def[lorelist_1]>
 
-#  slots:
-#    - "[] [] [] [] [] [] [] [] []"
+
+
+
+  #slots:
+    #- "[i@<npc.flag[display_i_1]>] [i@<npc.flag[display_i_2]>] [i@<npc.flag[display_i_3]>] [i@<npc.flag[display_i_4]>] [i@<npc.flag[display_i_5]>] [i@<npc.flag[display_i_6]>] [i@<npc.flag[display_i_7]>] [i@<npc.flag[display_i_8]>] [i@<npc.flag[display_i_9]>]"
+    #- "[i@<npc.flag[material_10]>] [i@<npc.flag[material_11]>] [i@<npc.flag[material_12]>] [i@<npc.flag[material_13]>] [i@<npc.flag[material_14]>] [i@<npc.flag[material_15]>] [i@<npc.flag[material_16]>] [i@<npc.flag[material_17]>] [i@<npc.flag[material_18]>]"
+    # "[i@<npc.flag[material_19]>] [i@<npc.flag[material_20]>] [i@<npc.flag[material_21]>] [i@<npc.flag[material_22]>] [i@<npc.flag[material_23]>] [i@<npc.flag[material_24]>] [i@<npc.flag[material_25]>] [i@<npc.flag[material_26]>] [i@<npc.flag[material_27]>]"
+    #- "[i@<npc.flag[material_28]>] [i@<npc.flag[material_29]>] [i@<npc.flag[material_30]>] [i@<npc.flag[material_31]>] [i@<npc.flag[material_32]>] [i@<npc.flag[material_33]>] [i@<npc.flag[material_34]>] [i@<npc.flag[material_35]>] [i@<npc.flag[material_36]>]"
+    #- "[] [] [] [] [] [] [] [] []"
+    #- "[] [] [] [] [] [] [] [] []"
+    #- "[] [] [] [] [] [] [] [] []"
 
 Trader_Handler:
   type: world
@@ -87,60 +104,74 @@ Trader_Handler:
       - ^flag player customer:false
       - ^flag player seller:false
 
+      - if <player.has_flag[edits_npc]>:
+          - narrate "<player> edits <player.flag[edits_npc]>"
+          - ^flag <player.flag[edits_npc]> "edit_mode:false"
+          - ^flag player edits_npc:!
+          - narrate "<green>edit mode disabled"
+
     # Handle user's click
     on player clicks in Trader_GUI:
       - define itemRaw stone[material=<context.item.material>]
       - define localMsg "<&f>[L]<&sp><&6><player.flag[trader_name]><&r><&8><&sp><&gt><&gt><&sp>"
       - define price <player.flag[price_<context.slot>]>
-      - if <player.flag[seller]>:
-        # player gives items and gets money
-        - if <context.item.material.contains[light_gray_stained_glass_pane] || player.inventory.is[==].to[context.clicked_inventory]>:
-            - determine cancelled
-            - stop
+      # player opened inventory to edit item layout
+      - if <player.has_flag[edits_npc]>:
+          - if <player.inventory.is[!=].to[<context.clicked_inventory>]>:
+            - flag <player.flag[edits_npc]> "material_<context.slot>:<context.cursor_item.material.replace[m@]>"
+            - narrate "set item of <npc> in slot <context.slot> to <context.cursor_item.material.replace[m@]>"
+      # player opened inventory to buy/sell items
+      - else:
+          - if <player.flag[seller]>:
+            # player gives items and gets money
+            - if <context.item.material.contains[light_gray_stained_glass_pane] || player.inventory.is[==].to[context.clicked_inventory]>:
+                - determine cancelled
+                - stop
 
-        - if <player.inventory.contains[<def[itemRaw]>].qty[64]>:
-              - take <def[itemRaw]> quantity:64
-              - narrate "<def[localMsg]><&2>item <context.item.display> sold for <&6><&l><def[price].mul[64]>$<&2>."
+            - if <player.inventory.contains[<def[itemRaw]>].qty[64]>:
+                  - take <def[itemRaw]> quantity:64
+                  - narrate "<def[localMsg]><&2>item <context.item.display> sold for <&6><&l><def[price].mul[64]>$<&2>."
 
-        - else:
-          - if <player.inventory.contains[<def[itemRaw]>].qty[32]>:
-              - take <def[itemRaw]> quantity:32
-              - narrate "<def[localMsg]><&2>item <context.item.display> sold for <&6><&l><def[price].mul[32]>$<&2>."
-          - else:
-            - if <player.inventory.contains[<def[itemRaw]>].qty[16]>:
-                - take <def[itemRaw]> quantity:16
-                - narrate "<def[localMsg]><&2>item <context.item.display> sold for <&6><&l><def[price].mul[16]>$<&2>."
             - else:
-              - if <player.inventory.contains[<def[itemRaw]>].qty[8]>:
-                - take <def[itemRaw]> quantity:8
-                - narrate "<def[localMsg]><&2>item <context.item.display> sold for <&6><&l><def[price].mul[8]>$<&2>."
+              - if <player.inventory.contains[<def[itemRaw]>].qty[32]>:
+                  - take <def[itemRaw]> quantity:32
+                  - narrate "<def[localMsg]><&2>item <context.item.display> sold for <&6><&l><def[price].mul[32]>$<&2>."
               - else:
-                  - if <player.inventory.contains[<def[itemRaw]>].qty[4]>:
-                      - take <def[itemRaw]> quantity:4
-                      - narrate "<def[localMsg]><&2>item <context.item.display> sold for <&6><&l><def[price].mul[4]>$<&2>."
+                - if <player.inventory.contains[<def[itemRaw]>].qty[16]>:
+                    - take <def[itemRaw]> quantity:16
+                    - narrate "<def[localMsg]><&2>item <context.item.display> sold for <&6><&l><def[price].mul[16]>$<&2>."
+                - else:
+                  - if <player.inventory.contains[<def[itemRaw]>].qty[8]>:
+                    - take <def[itemRaw]> quantity:8
+                    - narrate "<def[localMsg]><&2>item <context.item.display> sold for <&6><&l><def[price].mul[8]>$<&2>."
                   - else:
-                    - if <player.inventory.contains[<def[itemRaw]>].qty[2]>:
-                      - take <def[itemRaw]> quantity:2
-                      - narrate "<def[localMsg]><&2>item <context.item.display> sold for <&6><&l><def[price].mul[2]>$<&2>."
-                    - else:
-                        - if <player.inventory.contains[<def[itemRaw]>].qty[1]>:
-                            - take <def[itemRaw]> quantity:1
-                            - narrate "<def[localMsg]><&2>item <context.item.display> sold for <&6><&l><def[price].mul[1]>$<&2>."
+                      - if <player.inventory.contains[<def[itemRaw]>].qty[4]>:
+                          - take <def[itemRaw]> quantity:4
+                          - narrate "<def[localMsg]><&2>item <context.item.display> sold for <&6><&l><def[price].mul[4]>$<&2>."
+                      - else:
+                        - if <player.inventory.contains[<def[itemRaw]>].qty[2]>:
+                          - take <def[itemRaw]> quantity:2
+                          - narrate "<def[localMsg]><&2>item <context.item.display> sold for <&6><&l><def[price].mul[2]>$<&2>."
                         - else:
-                          - narrate "<def[localMsg]><&4>У вас нет этого предмета.<&4>."
-      - if <player.flag[customer]>:
-      # player gives money and gets items
-        - narrate "buy"
-        - if <context.is_shift_click>:
-            - narrate "you bought stack of <context.item> for <def[price].mul[64]>"
-            - take money quantity:<def[price].mul[64]>
-            - give stone[material=<context.item.material>] quantity:64
+                            - if <player.inventory.contains[<def[itemRaw]>].qty[1]>:
+                                - take <def[itemRaw]> quantity:1
+                                - narrate "<def[localMsg]><&2>item <context.item.display> sold for <&6><&l><def[price].mul[1]>$<&2>."
+                            - else:
+                              - narrate "<def[localMsg]><&4>У вас нет этого предмета.<&4>."
+          - if <player.flag[customer]>:
+          # player gives money and gets items
+            - narrate "buy"
+            - if <context.is_shift_click>:
+                - narrate "you bought stack of <context.item> for <def[price].mul[64]>"
+                - take money quantity:<def[price].mul[64]>
+                - give stone[material=<context.item.material>] quantity:64
 
-        - else:
-            - narrate "you bought <context.item> for <def[price].mul[1]>"
-            - take money quantity:<def[price].mul[1]>
-            - give stone[material=<context.item.material>] quantity:1
-      - determine cancelled
+            - else:
+                - narrate "you bought <context.item> for <def[price].mul[1]>"
+                - take money quantity:<def[price].mul[1]>
+                - give stone[material=<context.item.material>] quantity:1
+
+          - determine cancelled
 
 General_Set_Flag_Command:
   type: command
@@ -358,3 +389,16 @@ Set_Item_Display_Name_Command:
 #  script:
 #    - narrate "set trader name to <context.args.get[1]>"
 #    - npc flag "trader_name:<context.args.get[1]>"
+
+Edit_Trades_Command:
+  type: command
+  name: edittrades
+  description: todo
+  usage: /edittrades
+  permission: my.permission.node
+  permission message: Sorry, <player.name>, you can't use my command because you don't have the permission '<permission>'!
+  script:
+    - narrate "now you can edit trades layout"
+    - flag npc "edit_mode:true"
+    - flag player "edits_npc:<npc>"
+    - narrate <player.flag[edits_npc]>
