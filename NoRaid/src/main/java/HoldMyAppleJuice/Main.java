@@ -53,7 +53,6 @@ public class Main extends JavaPlugin implements Listener
     @Override
     public void onEnable()
     {
-        System.out.println(ChatColor.GOLD + "NORAID ACTIVATED");
         this.getServer().getPluginManager().registerEvents(this, this);
     }
 
@@ -136,17 +135,7 @@ public class Main extends JavaPlugin implements Listener
                     if(region.contains(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()))
                     {
                         e.setCancelled(true);
-                        if (DEBUG.toLowerCase().equals("true"))
-                        {
-                            for (OfflinePlayer administrator : Bukkit.getServer().getOperators())
-                            {
-                                if (administrator.isOnline())
-                                {
-                                    Bukkit.getServer().broadcastMessage("region " + ChatColor.AQUA + region.getId() + ChatColor.RESET + " cancelled raid " + "triggered by " + ChatColor.AQUA + e.getPlayer().getDisplayName());
-                                }
-                            }
-
-                        }
+                      
                     }
 
                 }

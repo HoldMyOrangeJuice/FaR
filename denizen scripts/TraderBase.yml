@@ -1,5 +1,5 @@
 # parse colors
-# .replace[<&lt>&1<&gt>].with[<&1>].replace[<&lt>&2<&gt>].with[<&2>].replace[<&lt>&3<&gt>].with[<&3>].replace[<&lt>&4<&gt>].with[<&4>].replace[<&lt>&5<&gt>].with[<&5>].replace[<&lt>&6<&gt>].with[<&6>].replace[<&lt>&7<&gt>].with[<&7>].replace[<&lt>&8<&gt>].with[<&8>].replace[<&lt>&9<&gt>].with[<&9>].replace[<&lt>&0<&gt>].with[<&0>].replace[<&lt>&a<&gt>].with[<&a>].replace[<&lt>&b<&gt>].with[<&b>].replace[<&lt>&c<&gt>].with[<&c>].replace[<&lt>&d<&gt>].with[<&d>].replace[<&lt>&e<&gt>].with[<&e>].replace[<&lt>&f<&gt>].with[<&f>].replace[<&lt>&k<&gt>].with[<&k>].replace[<&lt>&l<&gt>].with[<&l>].replace[<&lt>&m<&gt>].with[<&m>].replace[<&lt>&n<&gt>].with[<&n>].replace[<&lt>&o<&gt>].with[<&o>].replace[<&lt>&r<&gt>].with[<&r>]
+# .replace[<&lt>&1<&gt>].with[<&1>].replace[<&lt>dark_green<&gt>].with[<dark_green>].replace[<&lt>&3<&gt>].with[<&3>].replace[<&lt>&4<&gt>].with[<&4>].replace[<&lt>&5<&gt>].with[<&5>].replace[<&lt>gold<&gt>].with[<gold>].replace[<&lt>&7<&gt>].with[<&7>].replace[<&lt>&8<&gt>].with[<&8>].replace[<&lt>&9<&gt>].with[<&9>].replace[<&lt>&0<&gt>].with[<&0>].replace[<&lt>&a<&gt>].with[<&a>].replace[<&lt>&b<&gt>].with[<&b>].replace[<&lt>&c<&gt>].with[<&c>].replace[<&lt>&d<&gt>].with[<&d>].replace[<&lt>&e<&gt>].with[<&e>].replace[<&lt>&f<&gt>].with[<&f>].replace[<&lt>&k<&gt>].with[<&k>].replace[<&lt>&l<&gt>].with[<&l>].replace[<&lt>&m<&gt>].with[<&m>].replace[<&lt>&n<&gt>].with[<&n>].replace[<&lt>&o<&gt>].with[<&o>].replace[<&lt>&r<&gt>].with[<&r>]
 
 Trader:
   type: assignment
@@ -17,10 +17,10 @@ Trader:
       - repeat 54:
         - flag npc "price_<def[slot]>:69"
         - flag npc "material_<def[slot]>:air"
-        - flag npc "lore1_<def[slot]>:<&c>de<&6>fa<&e>u<&a>lt <&2>lo<&b>re<&9>1 <&1>te<&d>x<&5>t<&sp>"
-        - flag npc "lore2_<def[slot]>:<&c>de<&6>fa<&e>u<&a>lt <&2>lo<&b>re<&9>2 <&1>te<&d>x<&5>t<&sp>"
+        - flag npc "lore1_<def[slot]>:<&c>de<gold>fa<&e>u<&a>lt <dark_green>lo<&b>re<&9>1 <&1>te<&d>x<&5>t<&sp>"
+        - flag npc "lore2_<def[slot]>:<&c>de<gold>fa<&e>u<&a>lt <dark_green>lo<&b>re<&9>2 <&1>te<&d>x<&5>t<&sp>"
         - define slot:+:1
-      - narrate "<green><bold>default values initialized"
+      - narrate "<green><bold>[info:TraderBase]<reset> <aqua>default values initialized"
 
   interact scripts:
     - 1 Trader_Interact
@@ -38,10 +38,10 @@ Trader_Interact:
           # repetitive tags:
           - define slot 1
           - repeat 54:
-            - ^flag player price_1:<npc.flag[price_<def[slot]>]>
+            - ^flag player price_<def[slot]>:<npc.flag[price_<def[slot]>]>
             - define slot:+:1
           - inventory open d:in@Trader_GUI
-          -
+
 Trader_GUI:
   type: inventory
   #Название GUI
@@ -92,7 +92,8 @@ Trader_Handler:
   type: world
   events:
     on player drags in Trader_GUI:
-      - determine cancelled
+      #- if <!player.has_flag[edits_npc]>:
+        - determine cancelled
 
     # Reset player's flags
     on player closes Trader_GUI:
@@ -105,71 +106,86 @@ Trader_Handler:
       - ^flag player seller:false
 
       - if <player.has_flag[edits_npc]>:
-          - narrate "<player> edits <player.flag[edits_npc]>"
           - ^flag <player.flag[edits_npc]> "edit_mode:false"
           - ^flag player edits_npc:!
-          - narrate "<green>edit mode disabled"
+          - narrate "<green><bold>[info:TraderBase]<reset> <green>edit mode disabled"
 
     # Handle user's click
     on player clicks in Trader_GUI:
       - define itemRaw stone[material=<context.item.material>]
-      - define localMsg "<&f>[L]<&sp><&6><player.flag[trader_name]><&r><&8><&sp><&gt><&gt><&sp>"
+      - define localMsg "<&f>[L]<&sp><gold><player.flag[trader_name]><&r><&8><&sp><&gt><&gt><&sp>"
       - define price <player.flag[price_<context.slot>]>
       # player opened inventory to edit item layout
       - if <player.has_flag[edits_npc]>:
           - if <player.inventory.is[!=].to[<context.clicked_inventory>]>:
-            - flag <player.flag[edits_npc]> "material_<context.slot>:<context.cursor_item.material.replace[m@]>"
-            - narrate "set item of <npc> in slot <context.slot> to <context.cursor_item.material.replace[m@]>"
+            - narrate "<context.cursor_item.material.index_of[<&lb>]>"
+            - define index <context.cursor_item.material.index_of[<&lb>]>
+            - narrate "<context.cursor_item.material.replace[<context.cursor_item.material.substring[<context.cursor_item.material.index_of[<&lb>]>]>].replace[m@]>"
+            - flag <player.flag[edits_npc]> "material_<context.slot>:<context.cursor_item.material.replace[<context.cursor_item.material.substring[<context.cursor_item.material.index_of[<&lb>]>]>].replace[m@]>"
+            - narrate "<green><bold>[info:TraderBase]<reset> <aqua>set item in slot <gray>'<context.slot>'<aqua> to <gray>'<context.cursor_item.material.replace[m@]>'<blue>.<reset>"
       # player opened inventory to buy/sell items
       - else:
-          - if <player.flag[seller]>:
-            # player gives items and gets money
-            - if <context.item.material.contains[light_gray_stained_glass_pane] || player.inventory.is[==].to[context.clicked_inventory]>:
-                - determine cancelled
-                - stop
+          - if <context.item.material.is[!=].to[m@air]>:
+            - if <player.flag[seller]>:
+              # player gives items and gets money
+              - define inv <player.inventory>
+              - if <def[inv].is[==].to[<context.clicked_inventory>]>:
+                  - nararte "clicked on item in own inventory. cancel"
+                  - determine cancelled
+                  - stop
 
-            - if <player.inventory.contains[<def[itemRaw]>].qty[64]>:
-                  - take <def[itemRaw]> quantity:64
-                  - narrate "<def[localMsg]><&2>item <context.item.display> sold for <&6><&l><def[price].mul[64]>$<&2>."
+              - if <player.inventory.contains[<def[itemRaw]>].qty[64]>:
+                    - take <def[itemRaw]> quantity:64
+                    - give money quantity:<def[price].mul[64]>
+                    - narrate "<def[localMsg]><dark_green>item <context.item.display> sold for <gold><&l><def[price].mul[64]>$<dark_green>."
 
-            - else:
-              - if <player.inventory.contains[<def[itemRaw]>].qty[32]>:
-                  - take <def[itemRaw]> quantity:32
-                  - narrate "<def[localMsg]><&2>item <context.item.display> sold for <&6><&l><def[price].mul[32]>$<&2>."
+
               - else:
-                - if <player.inventory.contains[<def[itemRaw]>].qty[16]>:
-                    - take <def[itemRaw]> quantity:16
-                    - narrate "<def[localMsg]><&2>item <context.item.display> sold for <&6><&l><def[price].mul[16]>$<&2>."
+                - if <player.inventory.contains[<def[itemRaw]>].qty[32]>:
+                    - take <def[itemRaw]> quantity:32
+                    - give money quantity:<def[price].mul[32]>
+                    - narrate "<def[localMsg]><dark_green>item <context.item.display> sold for <gold><bold><def[price].mul[32]>$<dark_green>."
                 - else:
-                  - if <player.inventory.contains[<def[itemRaw]>].qty[8]>:
-                    - take <def[itemRaw]> quantity:8
-                    - narrate "<def[localMsg]><&2>item <context.item.display> sold for <&6><&l><def[price].mul[8]>$<&2>."
+                  - if <player.inventory.contains[<def[itemRaw]>].qty[16]>:
+                      - take <def[itemRaw]> quantity:16
+                      - give money quantity:<def[price].mul[16]>
+                      - narrate "<def[localMsg]><dark_green>item <context.item.display> sold for <gold><&l><def[price].mul[16]>$<dark_green>."
                   - else:
-                      - if <player.inventory.contains[<def[itemRaw]>].qty[4]>:
-                          - take <def[itemRaw]> quantity:4
-                          - narrate "<def[localMsg]><&2>item <context.item.display> sold for <&6><&l><def[price].mul[4]>$<&2>."
-                      - else:
-                        - if <player.inventory.contains[<def[itemRaw]>].qty[2]>:
-                          - take <def[itemRaw]> quantity:2
-                          - narrate "<def[localMsg]><&2>item <context.item.display> sold for <&6><&l><def[price].mul[2]>$<&2>."
+                    - if <player.inventory.contains[<def[itemRaw]>].qty[8]>:
+                      - take <def[itemRaw]> quantity:8
+                      - give money quantity:<def[price].mul[8]>
+                      - narrate "<def[localMsg]><dark_green>item <context.item.display> sold for <gold><&l><def[price].mul[8]>$<dark_green>."
+                    - else:
+                        - if <player.inventory.contains[<def[itemRaw]>].qty[4]>:
+                            - take <def[itemRaw]> quantity:4
+                            - give money quantity:<def[price].mul[4]>
+                            - narrate "<def[localMsg]><dark_green>item <context.item.display> sold for <gold><&l><def[price].mul[4]>$<dark_green>."
                         - else:
-                            - if <player.inventory.contains[<def[itemRaw]>].qty[1]>:
-                                - take <def[itemRaw]> quantity:1
-                                - narrate "<def[localMsg]><&2>item <context.item.display> sold for <&6><&l><def[price].mul[1]>$<&2>."
-                            - else:
-                              - narrate "<def[localMsg]><&4>У вас нет этого предмета.<&4>."
-          - if <player.flag[customer]>:
-          # player gives money and gets items
-            - narrate "buy"
-            - if <context.is_shift_click>:
-                - narrate "you bought stack of <context.item> for <def[price].mul[64]>"
-                - take money quantity:<def[price].mul[64]>
-                - give stone[material=<context.item.material>] quantity:64
+                          - if <player.inventory.contains[<def[itemRaw]>].qty[2]>:
+                            - take <def[itemRaw]> quantity:2
+                            - give money quantity:<def[price].mul[2]>
+                            - narrate "<def[localMsg]><dark_green>item <context.item.display> sold for <gold><&l><def[price].mul[2]>$<dark_green>."
+                          - else:
+                              - if <player.inventory.contains[<def[itemRaw]>].qty[1]>:
+                                  - take <def[itemRaw]> quantity:1
+                                  - give money quantity:<def[price].mul[1]>
+                                  - narrate "<def[localMsg]><dark_green>item <context.item.display> sold for <gold><&l><def[price].mul[1]>$<dark_green>."
+                              - else:
+                                - narrate "<def[localMsg]><dark_red>У вас нет этого предмета.<reset>"
+            - if <player.flag[customer]>:
+            # player gives money and gets items
+              - if <player.inventory.is[==].to[context.clicked_inventory]>:
+                      - determine cancelled
+                      - stop
+              - if <context.is_shift_click>:
+                  - narrate "<dark_green>you bought stack of <context.item> for <gold>$<def[price].mul[64]><dark_green>."
+                  - take money quantity:<def[price].mul[64]>
+                  - give stone[material=<context.item.material>] quantity:64
 
-            - else:
-                - narrate "you bought <context.item> for <def[price].mul[1]>"
-                - take money quantity:<def[price].mul[1]>
-                - give stone[material=<context.item.material>] quantity:1
+              - else:
+                  - narrate "<dark_green>you bought <context.item> for <gold>$<def[price].mul[1]><dark_green>."
+                  - take money quantity:<def[price].mul[1]>
+                  - give stone[material=<context.item.material>] quantity:1
 
           - determine cancelled
 
@@ -193,12 +209,13 @@ General_Set_Flag_Command:
     - if !<player.is_op||<context.server>>:
         - narrate "<red>You do not have permission for that command."
         - stop
-
-    # arguments are actually starting from index 1
-    - flag npc "<context.args.get[1]>:<context.args.get[2]>"
-    - narrate "list of args <context.args>"
-    - narrate "set flag to "<context.args.get[1]>:<context.args.get[2]>"
-    - narrate "flag <context.args.get[1]> is <npc.flag[<context.args.get[1]>]>"
+    - define mynpc <npc||true>
+    - if <def[mynpc]>:
+        - narrate "<red><bold>[error:TraderBase]<reset><red> You need to select an NPC first with <underline><green>/npc select<reset><red> while near target npc"
+        - stop
+    - else:
+        - flag npc "<context.args.get[1]>:<context.args.get[2]>"
+        - narrate "<green><bold>[info:TraderBase]<reset> <aqua>flag <gray>'<context.args.get[1]>' <aqua>now is <gray>'<npc.flag[<context.args.get[1]>]>'"
 
 General_Get_Flag_Command:
   type: command
@@ -213,15 +230,18 @@ General_Get_Flag_Command:
     - if !<player.is_op||<context.server>>:
         - narrate "<red>You do not have permission for that command."
         - stop
-
-    - narrate "flag name <context.args.get[1]>"
-    - narrate <npc.flag[<context.args.get[1]>]>
+    - define mynpc <npc||true>
+    - if <def[mynpc]>:
+        - narrate "<red><bold>[error:TraderBase]<reset><red> You need to select an NPC first with <underline><green>/npc select<reset><red> while near target npc"
+        - stop
+    - else:
+        - narrate "<green><bold>[info:TraderBase]<reset> <aqua>flag <gray>'<context.args.get[1]>' <aqua>is <gray>'<npc.flag[<context.args.get[1]>]||<red>null<reset>>'"
 
 Set_Size_Command:
   type: command
   name: setsize
   description: sets size of npc nearby
-  usage: /no
+  usage: /setsize
   permission: my.permission.node
   permission message: Sorry, <player.name>, you can't use my command because you don't have the permission '<permission>'!
   allowed help:
@@ -233,7 +253,15 @@ Set_Size_Command:
     - if !<player.is_op||<context.server>>:
         - narrate "<red>You do not have permission for that command."
         - stop
-    - flag npc "size:<context.args.get[1]>"
+    - define mynpc <npc||true>
+    - if <de[mynpc]>:
+        - narrate "<red><bold>[error:TraderBase]<reset><red> You need to select an NPC first with <gray><underline>/npc select<reset><red> while near target npc"
+        - stop
+    - if <context.args.get[1].is_integer>:
+      - flag npc "size:<context.args.get[1]||<npc.flag[size]>>"
+      - narrate "<green><bold>[info:TraderBase]<reset> <aqua>set trader's inventory size to <gray>'<context.args.get[1]||null>'<reset><aqua>."
+    - else:
+      - narrate "<red><bold>[error:TraderBase]<reset> <red>argument <gray>'<context.args.get[1]||null>'<reset> <red>is invalid!"
 
 Set_Price_Command:
   type: command
@@ -246,45 +274,89 @@ Set_Price_Command:
     - determine <player.is_op||<context.server>>
 
   script:
+    - define mynpc <npc||true>
     - if !<player.is_op||<context.server>>:
         - narrate "<red>You do not have permission for that command."
         - stop
-    - flag npc "price_<context.args.get[1]>:<context.args.get[2]>"
+    - if <def[mynpc]>:
+        - narrate "<red><bold>[error:TraderBase]<reset><red> You need to select an NPC first with <underline><green>/npc select<reset><red> while near target npc"
+        - stop
+    - else:
+        - if <context.args.get[1].is_integer>:
+            - if <context.args.get[1].is[less].than[55]>:
+                - if <context.args.get[2].is_integer>:
+                  - flag npc "price_<context.args.get[1]>:<context.args.get[2]>"
+                  - narrate "<green><bold>[info:TraderBase]<reset> <aqua>set price of slot <gray>'<context.args.get[1]>'<aqua> to <gray>'<context.args.get[2]>'<aqua>."
+                - else:
+                    - narrate "<red><bold>[error:TraderBase]<reset> <red>price <gray>'<context.args.get[2]||null>'<red> have to be an integer!"
+            - else:
+                - narrate "<red><bold>[error:TraderBase]<reset> <red>slot index <gray>'<context.args.get[1]||null>'<gray> <red>is out of range! (<italic>54 max<reset><red>)."
+        - else:
+            - narrate "<red><bold>[error:TraderBase]<reset> <red>slot index <gray>'<context.args.get[1]||null>'<gray> <red>is not an integer!"
+
 
 Set_Lore_Command:
   type: command
   name: setlore
-  description: sets lore for item of npc nearby
-  usage: /setlore [slot] [first lore line] (second lore line)
+  description: sets lore for slot of trader's inventory
+  usage: /setlore [slot|all] [<green>lore line1<reset> | <red>null<reset> | <dark_purple>same<reset>] (<green>lore line2<reset> | <red>null<reset> | <dark_purple>same<reset>)
   permission: my.permission.node
   permission message: Sorry, <player.name>, you can't use my command because you don't have the permission '<permission>'!
   allowed help:
     - determine <player.is_op||<context.server>>
 
   script:
+
     - if !<player.is_op||<context.server>>:
         - narrate "<red>You do not have permission for that command."
         - stop
-    - if <context.args.get[2].is[==].to[same]>:
-        # - flag npc "lore1_<context.args.get[1]>:<context.args.get[2]>"
-        - narrate "<&a>lore1_<context.args.get[1]> stays same<&co><&r> <npc.flag[lore1_<context.args.get[1]>]>"
-    - else:
-      - flag npc "lore1_<context.args.get[1]>:<context.args.get[2]>"
-      - narrate "<&a>set lore1_<context.args.get[1]> to<&co><&r><context.args.get[2]>"
 
-    - if <context.args.size.is[==].to[3]>:
-        - if <context.args.get[3].is[==].to[same]>:
-            # - flag npc "lore2_<context.args.get[1]>:<context.args.get[3]>"
-            - narrate "<&a>lore2_<context.args.get[1]> stays same<&co><&r> <npc.flag[lore2_<context.args.get[3]>]>"
+    - define mynpc <npc||true>
+    - if <def[mynpc]>:
+        - narrate "<red><bold>[error:TraderBase]<reset><red> You need to select an NPC first with <underline><green>/npc select<reset><red> while near target npc"
+        - stop
+    - else:
+        - define slot <context.args.get[1]||null>
+        - define lore1 <context.args.get[2]||same>
+        - define lore2 <context.args.get[3]||same>
+
+        - if <def[slot].is[==].to[null]>:
+            - narrate "usage: /setlore [line1|null|same] (line2|null|same)"
+            - stop
+        - if <def[slot].is_integer>:
+            - if <def[slot].is[less].than[55]>:
+                - if <def[lore1].is[==].to[same]>:
+                    - narrate "<green><bold>[info:TraderBase]<reset> lore1_<context.args.get[1]> stays same<&co><reset> <gray>'<npc.flag[lore1_<context.args.get[1]>]>'"
+                - else:
+                    - flag npc "lore1_<context.args.get[1]>:<context.args.get[2]>"
+                    - narrate "<green><bold>[info:TraderBase]<reset> set lore1_<context.args.get[1]> to<&co> <gray>'<parse:<context.args.get[2]>>'"
+
+                - if <def[lore2].is[==].to[same]>:
+                    - narrate "<green><bold>[info:TraderBase]<reset> lore2_<context.args.get[1]> stays same<&co><reset> <gray>'<npc.flag[lore2_<context.args.get[1]>]>'"
+                - else:
+                    - flag npc "lore2_<context.args.get[1]>:<context.args.get[3]>"
+                    - narrate "<green><bold>[info:TraderBase]<reset> set lore2_<context.args.get[1]> to<&co><&r> <gray>'<parse:<context.args.get[3]>>'"
+            - else:
+                - narrate "<red><bold>[error:TraderBase]<reset> <red>slot index <gray>'<context.args.get[1]||null>'<gray> <red>is out of range! (<italic>54 max<reset><red>)."
         - else:
-            - flag npc "lore2_<context.args.get[1]>:<context.args.get[3]>"
-            - narrate "<&a>set lore2_<context.args.get[1]> to<&co><&r> <parse:<context.args.get[3]>>"
+            - if <def[slot].is[==].to[all]>:
+                - define slot 1
+                - repeat <npc.flag[size]>:
+                    - if <def[lore1].is[!=].to[same]>:
+                        - flag npc "lore1_<def[slot]>:<def[lore1].replace[~].with[<def[slot]>]>"
+                    - if <def[lore2].is[!=].to[same]>:
+                        - flag npc "lore2_<def[slot]>:<def[lore2].replace[~].with[<def[slot]>]>"
+                    - define slot:+:1
+                - narrate "<green><bold>[info:TraderBase]<reset> <green>set lore to <gray>'<def[lore1]>'<reset> and <gray>'<def[lore2]>'<reset> for slots 1 to <npc.flag[size]>"
+            - else:
+              - narrate "<red><bold>[error:TraderBase]<reset><red> slot <gray>'<def[slot]>'<reset><red> is not an integer or <gray>'all'<reset><red>!"
+
 
 
 Set_Material_Command:
   type: command
   name: setmat
-  description: sets price for item of npc nearby
+  description: sets item for slot of trader's inventory
   usage: /setmat [slot] [material]
   permission: my.permission.node
   permission message: Sorry, <player.name>, you can't use my command because you don't have the permission '<permission>'!
@@ -299,19 +371,20 @@ Set_Material_Command:
     - if !<player.is_op||<context.server>>:
         - narrate "<red>You do not have permission for that command."
         - stop
-    - narrate "set material of slot <context.args.get[1]> to <context.args.get[2]>"
-    - if <context.args.get[2].is[==].to[air]>:
-        - narrate "add empty slot"
-        - flag npc "material_<context.args.get[1]>:air"
+    - define mynpc <npc||true>
+    - if <def[mynpc]>:
+        - narrate "<red><bold>[error:TraderBase]<reset><red> You need to select an NPC first with <underline><green>/npc select<reset><red> while near target npc"
+        - stop
     - else:
-        - flag npc "material_<context.args.get[1]>:<context.args.get[2]>"
+      - narrate "<green><bold>[info:TraderBase]<reset> set material of slot <context.args.get[1]> to <context.args.get[2]>"
+      - flag npc "material_<context.args.get[1]>:<context.args.get[2]>"
 
 
 
 Set_Title_Command:
   type: command
   name: settitle
-  description: sets lore for item of npc nearby
+  description: sets title visible in trader's inventory
   usage: /settitle [GUI title]
   permission: my.permission.node
   permission message: Sorry, <player.name>, you can't use my command because you don't have the permission '<permission>'!
@@ -322,14 +395,19 @@ Set_Title_Command:
     - if !<player.is_op||<context.server>>:
         - narrate "<red>You do not have permission for that command."
         - stop
-    - flag npc "inv_title:<context.args.get[1]>"
-    - narrate "set inventory title to <parse:<context.args.get[1]>>"
+    - define mynpc <npc||true>
+    - if <def[mynpc]>:
+        - narrate "<red><bold>[error:TraderBase]<reset><red> You need to select an NPC first with <underline><green>/npc select<reset><red> while near target npc"
+        - stop
+    - else:
+      - flag npc "inv_title:<context.args.get[1]>"
+      - narrate "<green><bold>[info:TraderBase]<reset> set inventory title to <parse:<context.args.get[1]>>"
 
 check_encoding:
   type: command
   name: checkencoding
   description: ...
-  usage: /setmat [slot] [material]
+  usage: /checkencoding
   permission: my.permission.node
   permission message: Sorry, <player.name>, you can't use my command because you don't have the permission '<permission>'!
   allowed help:
@@ -357,35 +435,44 @@ Set_Trader_Mode_Command:
     - if !<player.is_op||<context.server>>:
         - narrate "<red>You do not have permission for that command."
         - stop
-    - if <context.args.get[1].is[==].to[sell]>:
-        - flag npc "trader_mode:<context.args.get[1]>"
-        - narrate "<green><bold>Теперь торговец будет продавать предметы"
+    - define mynpc <npc||true>
+    - if <def[mynpc]>:
+        - narrate "<red><bold>[error:TraderBase]<reset><red> You need to select an NPC first with <underline><green>/npc select<reset><red> while near target npc"
         - stop
-    - if <context.args.get[1].is[==].to[buy]>:
-        - flag npc "trader_mode:<context.args.get[1]>"
-        - narrate "<dark_purple><bold>Теперь торговец будет скупать предметы"
-        - stop
-    - narrate "<red><bold>Допустимые аргументы<&co>buy|sell"
+    - else:
+      - if <context.args.get[1].is[==].to[sell]>:
+          - flag npc "trader_mode:<context.args.get[1]>"
+          - narrate "<green><bold>[info:TraderBase]<reset> <green><bold>Теперь торговец будет продавать предметы"
+          - stop
+      - if <context.args.get[1].is[==].to[buy]>:
+          - flag npc "trader_mode:<context.args.get[1]>"
+          - narrate "<green><bold>[info:TraderBase]<reset> <dark_purple><bold>Теперь торговец будет скупать предметы"
+          - stop
+      - narrate "<red><bold>[error:TraderBase]<reset> <red><bold>Допустимые аргументы<&co>buy|sell"
 
 Set_Trader_Name_Command:
   type: command
   name: setname
-  description: Устанавливает режим торговца на скупку или продажу
+  description: Sets trader name visible in chat
   usage: /setname [ trader name ]
   permission: my.permission.node
   permission message: Sorry, <player.name>, you can't use my command because you don't have the permission '<permission>'!
   script:
-    - narrate "trader_name:<context.args.get[1]>"
-    - flag npc "trader_name:<context.args.get[1]>"
-    - narrate <npc.flag[trader_name]>
+    - define mynpc <npc||true>
+    - if <def[mynpc]>:
+      - narrate "<red><bold>[error:TraderBase]<reset><red> You need to select an NPC first with <underline><green>/npc select<reset><red> while near target npc"
+      - stop
+    - else:
+      - narrate "<green><bold>[info:TraderBase]<reset> <aqua>set trader name to: <reset><parse:<context.args.get[1]>>"
+      - flag npc "trader_name:<context.args.get[1]>"
 
-Set_Item_Display_Name_Command:
-  type: command
-  name: setdispname
-  description: Sets display name of item
-  usage: /setdispname [ trader name ]
-  permission: my.permission.node
-  permission message: Sorry, <player.name>, you can't use my command because you don't have the permission '<permission>'!
+#Set_Item_Display_Name_Command:
+#  type: command
+#  name: setdispname
+#  description: Sets display name of item
+#  usage: /setdispname [ trader name ]
+#  permission: my.permission.node
+#  permission message: Sorry, <player.name>, you can't use my command because you don't have the permission '<permission>'!
 #  script:
 #    - narrate "set trader name to <context.args.get[1]>"
 #    - npc flag "trader_name:<context.args.get[1]>"
@@ -393,12 +480,61 @@ Set_Item_Display_Name_Command:
 Edit_Trades_Command:
   type: command
   name: edittrades
-  description: todo
+  description: turns on editor mode for trader item layout
   usage: /edittrades
   permission: my.permission.node
   permission message: Sorry, <player.name>, you can't use my command because you don't have the permission '<permission>'!
   script:
-    - narrate "now you can edit trades layout"
-    - flag npc "edit_mode:true"
-    - flag player "edits_npc:<npc>"
-    - narrate <player.flag[edits_npc]>
+    - define mynpc <npc||true>
+    - if <def[mynpc]>:
+        - narrate "<red><bold>[error:TraderBase]<reset><red> You need to select an NPC first with <underline><green>/npc select<reset><red> while near target npc"
+        - stop
+    - else:
+      - narrate "<green><bold>[info:TraderBase]<reset> <green>now you can edit trades layout"
+      - flag npc "edit_mode:true"
+      - flag player "edits_npc:<npc>"
+
+Get_Layout_Command:
+  type: command
+  name: getlayout
+  description: returns material layout. /getlayout all to get material=air as well.
+  usage: /getlayout (all)
+  permission: my.permission.node
+  permission message: Sorry, <player.name>, you can't use my command because you don't have the permission '<permission>'!
+  script:
+    - define mynpc <npc||true>
+    - if <def[mynpc]>:
+        - narrate "<red><bold>[error:TraderBase]<reset><red> You need to select an NPC first with <underline><green>/npc select<reset><red> while near target npc"
+        - stop
+    - else:
+      - define slot 1
+      - narrate "<red>slot<reset> | <yellow>material<reset> | <green>price<reset> | <blue>lore 1<reset> | <dark_purple>lore 2<reset>"
+      - repeat <npc.flag[size]>:
+          - if <npc.flag[material_<def[slot]>].is[!=].to[air]>:
+            - narrate "<red><def[slot]><reset><&co> <yellow><npc.flag[material_<def[slot]>]><reset> <&co> <green><npc.flag[price_<def[slot]>]><reset>  <&co> <blue><npc.flag[lore1_<def[slot]>]> <&co><dark_purple> <npc.flag[lore2_<def[slot]>]><reset>"
+
+          - else:
+              - if <context.args.get[1].is[==].to[all]||false>:
+                  - narrate "<red><def[slot]><reset><&co> <yellow><npc.flag[material_<def[slot]>]><reset> <&co> <green><npc.flag[price_<def[slot]>]><reset>  <&co> <blue><npc.flag[lore1_<def[slot]>]> <&co><dark_purple> <npc.flag[lore2_<def[slot]>]><reset>"
+
+          - define slot:+:1
+
+Help_Me_Command:
+  type: command
+  name: traderhelp
+  description: prints out some commands
+  usage: /traderhelp<gray> somewhere in future (command)...
+  permission: my.permission.node
+  permission message: Sorry, <player.name>, you can't use my command because you don't have the permission '<permission>'!
+  script:
+    - narrate "<white><bold>/getflag <&lt><green>flag name<reset><&gt>"
+    - narrate "<white><bold>/getlayout <&lt><green>all(optional)<reset><&gt>"
+    - narrate "<white><bold>/setflag <&lt><green>flag name<reset><&gt> <&lt><green>flag value<reset><&gt>"
+    - narrate "<white><bold>/setsize <&lt><green>inventory size<reset><&gt>"
+    - narrate "<white><bold>/setprice <&lt><green>slot<reset><&gt> <&lt><green>price<reset><&gt>"
+    - narrate "<white><bold>/setlore <&lt><green>slot|all<reset><&gt> <&lt><green>lore1|null|same<reset><&gt> <&lt><green>lore2|null|same<reset><&gt>"
+    - narrate "<white><bold>/setname <&lt><green>name<reset><&gt>"
+    - narrate "<white><bold>/settitle <&lt><green>title<reset><&gt>"
+    - narrate "<white><bold>/edittrades"
+    - narrate "<white><bold>/setmode <&lt><green>sell|buy<reset><&gt>"
+    - narrate "<white><bold>/setmat <&lt><green>slot<reset><&gt> <&lt><green>material<reset><&gt>"
