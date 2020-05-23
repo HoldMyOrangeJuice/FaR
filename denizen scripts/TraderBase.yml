@@ -118,60 +118,70 @@ Trader_Handler:
       # player opened inventory to edit item layout
       - if <player.has_flag[edits_npc]>:
           - if <player.inventory.is[!=].to[<context.clicked_inventory>]>:
-            - narrate "<context.cursor_item.material.index_of[<&lb>]>"
-            - define index <context.cursor_item.material.index_of[<&lb>]>
-            - narrate "<context.cursor_item.material.replace[<context.cursor_item.material.substring[<context.cursor_item.material.index_of[<&lb>]>]>].replace[m@]>"
-            - flag <player.flag[edits_npc]> "material_<context.slot>:<context.cursor_item.material.replace[<context.cursor_item.material.substring[<context.cursor_item.material.index_of[<&lb>]>]>].replace[m@]>"
-            - narrate "<green><bold>[info:TraderBase]<reset> <aqua>set item in slot <gray>'<context.slot>'<aqua> to <gray>'<context.cursor_item.material.replace[m@]>'<blue>.<reset>"
+          
+            - if <context.cursor_item.material.contains[<&lb>]>:    
+				- narrate "item has hroperty"
+                - flag <player.flag[edits_npc]> "material_<context.slot>:<context.cursor_item.material.replace[<context.cursor_item.material.substring[<context.cursor_item.material.index_of[<&lb>]>]>].replace[m@]>"
+				- narrate "<green><bold>[info:TraderBase]<reset> <aqua>set item in slot <gray>'<context.slot>'<aqua> to <gray>'<context.cursor_item.material.replace[<context.cursor_item.material.substring[<context.cursor_item.material.index_of[<&lb>]>]>].replace[m@]>'<blue>.<reset>"
+			- else:
+				- narrate "item does not have property"
+                - flag <player.flag[edits_npc]> "material_<context.slot>:<context.cursor_item.material.replace[m@]>"
+				- narrate "<green><bold>[info:TraderBase]<reset> <aqua>set item in slot <gray>'<context.slot>'<aqua> to <gray>'<context.cursor_item.material.replace[m@]>'<blue>.<reset>"
+			- define member_edited <player.flag[edits_npc]>
+			- narrate "group <def[member_edited].as_npc.flag[group]> of <def[member_edited]>"
+			
+			- if <player.flag[edits_npc].as_npc.has_flag[group]>:
+				# set material for all group members
+				- foreach <list[<server.flag[<def[member_edited].as_npc.flag[group]>]>]>:
+					- narrate "changed <[value]>"
+					- if <def[member_edited].is[==].to[null]>:
+						- narrate "something went wrong"
+						- stop
+					- narrate "set flag material_<context.slot> of <[value]> to <def[member_edited].as_npc.flag[material_<context.slot>]>"
+					- flag <[value]> "material_<context.slot>:<def[member_edited].as_npc.flag[material_<context.slot>]>"
+			- else:
+				- narrate "not in group"
       # player opened inventory to buy/sell items
       - else:
           - if <context.item.material.is[!=].to[m@air]>:
             - if <player.flag[seller]>:
-              # player gives items and gets money
-              - define inv <player.inventory>
-              - if <def[inv].is[==].to[<context.clicked_inventory>]>:
-                  - nararte "clicked on item in own inventory. cancel"
-                  - determine cancelled
-                  - stop
-
-              - if <player.inventory.contains[<def[itemRaw]>].qty[64]>:
-                    - take <def[itemRaw]> quantity:64
-                    - give money quantity:<def[price].mul[64]>
-                    - narrate "<def[localMsg]><dark_green>item <context.item.display> sold for <gold><&l><def[price].mul[64]>$<dark_green>."
-
-
-              - else:
-                - if <player.inventory.contains[<def[itemRaw]>].qty[32]>:
-                    - take <def[itemRaw]> quantity:32
-                    - give money quantity:<def[price].mul[32]>
-                    - narrate "<def[localMsg]><dark_green>item <context.item.display> sold for <gold><bold><def[price].mul[32]>$<dark_green>."
-                - else:
-                  - if <player.inventory.contains[<def[itemRaw]>].qty[16]>:
-                      - take <def[itemRaw]> quantity:16
-                      - give money quantity:<def[price].mul[16]>
-                      - narrate "<def[localMsg]><dark_green>item <context.item.display> sold for <gold><&l><def[price].mul[16]>$<dark_green>."
-                  - else:
-                    - if <player.inventory.contains[<def[itemRaw]>].qty[8]>:
-                      - take <def[itemRaw]> quantity:8
-                      - give money quantity:<def[price].mul[8]>
-                      - narrate "<def[localMsg]><dark_green>item <context.item.display> sold for <gold><&l><def[price].mul[8]>$<dark_green>."
-                    - else:
-                        - if <player.inventory.contains[<def[itemRaw]>].qty[4]>:
-                            - take <def[itemRaw]> quantity:4
-                            - give money quantity:<def[price].mul[4]>
-                            - narrate "<def[localMsg]><dark_green>item <context.item.display> sold for <gold><&l><def[price].mul[4]>$<dark_green>."
-                        - else:
-                          - if <player.inventory.contains[<def[itemRaw]>].qty[2]>:
-                            - take <def[itemRaw]> quantity:2
-                            - give money quantity:<def[price].mul[2]>
-                            - narrate "<def[localMsg]><dark_green>item <context.item.display> sold for <gold><&l><def[price].mul[2]>$<dark_green>."
-                          - else:
-                              - if <player.inventory.contains[<def[itemRaw]>].qty[1]>:
-                                  - take <def[itemRaw]> quantity:1
-                                  - give money quantity:<def[price].mul[1]>
-                                  - narrate "<def[localMsg]><dark_green>item <context.item.display> sold for <gold><&l><def[price].mul[1]>$<dark_green>."
-                              - else:
-                                - narrate "<def[localMsg]><dark_red>У вас нет этого предмета.<reset>"
+			  # player gives items and gets money
+			    - define inv <player.inventory>
+			    - if <def[inv].is[==].to[<context.clicked_inventory>]>:
+				    - determine cancelled
+				    - stop
+					
+				- if <context.is_shift_click>:
+					- define amount 2368
+					- repeat 2368:
+						- if <player.inventory.contains[<def[itemRaw]>].qty[<def[amount]>]>:						
+							- take <def[itemRaw]> quantity:<def[amount]>
+							- give money quantity:<def[price].mul[<def[amount]>]>
+							- narrate "<def[localMsg]><dark_green><def[amount]> items sold for <gold><&l><def[price].mul[<def[amount]>]>$<dark_green>."
+							- determine cancelled
+						- else:
+							- if <def[amount].is[==].to[1]>:
+								- narrate "<def[localMsg]><dark_red>У вас нет этого предмета.<reset>"
+								- determine cancelled
+							- else:
+								- define amount:-:1
+				- else:
+					- define amount_small 64
+					- repeat 64:
+						- if <player.inventory.contains[<def[itemRaw]>].qty[<def[amount_small]>]>:						
+							- take <def[itemRaw]> quantity:<def[amount_small]>
+							- give money quantity:<def[price].mul[<def[amount_small]>]>
+							- narrate "<def[localMsg]><dark_green><def[amount_small]> items sold for <gold><&l><def[price].mul[<def[amount_small]>]>$<dark_green>."
+							- determine cancelled
+						- else:
+							- if <def[amount_small].is[==].to[1]>:
+								- narrate "<def[localMsg]><dark_red>У вас нет этого предмета.<reset>"
+								- determine cancelled
+							- else:
+								- define amount_small:-:1
+									
+									
+									
             - if <player.flag[customer]>:
             # player gives money and gets items
               - if <player.inventory.is[==].to[context.clicked_inventory]>:
@@ -254,7 +264,7 @@ Set_Size_Command:
         - narrate "<red>You do not have permission for that command."
         - stop
     - define mynpc <npc||true>
-    - if <de[mynpc]>:
+    - if <def[mynpc]>:
         - narrate "<red><bold>[error:TraderBase]<reset><red> You need to select an NPC first with <gray><underline>/npc select<reset><red> while near target npc"
         - stop
     - if <context.args.get[1].is_integer>:
@@ -286,6 +296,10 @@ Set_Price_Command:
             - if <context.args.get[1].is[less].than[55]>:
                 - if <context.args.get[2].is_integer>:
                   - flag npc "price_<context.args.get[1]>:<context.args.get[2]>"
+				  - narrate "list is: <server.flag[<npc.flag[group]>]>"
+				  - foreach <list[<server.flag[<npc.flag[group]>]>]>:
+					- narrate "set flag price_<context.args.get[1]> of <[value]> to <context.args.get[2]>"
+					- flag <[value]> "price_<context.args.get[1]>:<context.args.get[2]>"
                   - narrate "<green><bold>[info:TraderBase]<reset> <aqua>set price of slot <gray>'<context.args.get[1]>'<aqua> to <gray>'<context.args.get[2]>'<aqua>."
                 - else:
                     - narrate "<red><bold>[error:TraderBase]<reset> <red>price <gray>'<context.args.get[2]||null>'<red> have to be an integer!"
@@ -294,6 +308,22 @@ Set_Price_Command:
         - else:
             - narrate "<red><bold>[error:TraderBase]<reset> <red>slot index <gray>'<context.args.get[1]||null>'<gray> <red>is not an integer!"
 
+
+loop:
+  type: command
+  name: loop
+  description: sets lore for slot of trader's inventory
+  usage: /setlore [slot|all] [<green>lore line1<reset> | <red>null<reset> | <dark_purple>same<reset>] (<green>lore line2<reset> | <red>null<reset> | <dark_purple>same<reset>)
+  permission: my.permission.node
+  permission message: Sorry, <player.name>, you can't use my command because you don't have the permission '<permission>'!
+  allowed help:
+    - determine <player.is_op||<context.server>>
+
+  script:
+	- narrate "list is: <server.flag[<npc.flag[group]>]>"
+	- foreach <list[<server.flag[<npc.flag[group]>]>]>:
+		- narrate "val <[value]>"
+		- narrate "idx <[loop_index]>"
 
 Set_Lore_Command:
   type: command
@@ -329,13 +359,19 @@ Set_Lore_Command:
                     - narrate "<green><bold>[info:TraderBase]<reset> lore1_<context.args.get[1]> stays same<&co><reset> <gray>'<npc.flag[lore1_<context.args.get[1]>]>'"
                 - else:
                     - flag npc "lore1_<context.args.get[1]>:<context.args.get[2]>"
-                    - narrate "<green><bold>[info:TraderBase]<reset> set lore1_<context.args.get[1]> to<&co> <gray>'<parse:<context.args.get[2]>>'"
-
+					- narrate "<green><bold>[info:TraderBase]<reset> set lore1_<context.args.get[1]> to<&co> <gray>'<parse:<context.args.get[2]>>'"
+					- foreach <list[<server.flag[<npc.flag[group]>]>]>:
+						- narrate "set flag lore1_<context.args.get[1]> of <[value]> to <context.args.get[2]>"
+						- flag <[value]> "lore1_<context.args.get[1]>:<context.args.get[2]>"
+                   
                 - if <def[lore2].is[==].to[same]>:
                     - narrate "<green><bold>[info:TraderBase]<reset> lore2_<context.args.get[1]> stays same<&co><reset> <gray>'<npc.flag[lore2_<context.args.get[1]>]>'"
                 - else:
                     - flag npc "lore2_<context.args.get[1]>:<context.args.get[3]>"
                     - narrate "<green><bold>[info:TraderBase]<reset> set lore2_<context.args.get[1]> to<&co><&r> <gray>'<parse:<context.args.get[3]>>'"
+					- foreach <list[<server.flag[<npc.flag[group]>]>]>:
+						- narrate "set flag lore2_<context.args.get[1]> of <[value]> to <context.args.get[3]>"
+						- flag <[value]> "lore2_<context.args.get[1]>:<context.args.get[3]>"
             - else:
                 - narrate "<red><bold>[error:TraderBase]<reset> <red>slot index <gray>'<context.args.get[1]||null>'<gray> <red>is out of range! (<italic>54 max<reset><red>)."
         - else:
@@ -344,8 +380,12 @@ Set_Lore_Command:
                 - repeat <npc.flag[size]>:
                     - if <def[lore1].is[!=].to[same]>:
                         - flag npc "lore1_<def[slot]>:<def[lore1].replace[~].with[<def[slot]>]>"
+						- foreach <list[<server.flag[<npc.flag[group]>]>]>:
+							- flag <[value]> "lore1_<def[slot]>:<def[lore1].replace[~].with[<def[slot]>]>"
                     - if <def[lore2].is[!=].to[same]>:
                         - flag npc "lore2_<def[slot]>:<def[lore2].replace[~].with[<def[slot]>]>"
+						- foreach <list[<server.flag[<npc.flag[group]>]>]>:
+							- flag <[value]> "lore2_<def[slot]>:<def[lore2].replace[~].with[<def[slot]>]>"
                     - define slot:+:1
                 - narrate "<green><bold>[info:TraderBase]<reset> <green>set lore to <gray>'<def[lore1]>'<reset> and <gray>'<def[lore2]>'<reset> for slots 1 to <npc.flag[size]>"
             - else:
@@ -508,17 +548,177 @@ Get_Layout_Command:
         - stop
     - else:
       - define slot 1
-      - narrate "<red>slot<reset> | <yellow>material<reset> | <green>price<reset> | <blue>lore 1<reset> | <dark_purple>lore 2<reset>"
+      - narrate "<white><underline>slot   material           price          <reset>
+	
+	  - define fifteen 15
+	  - define ten 10
+	  - define five 5
+	  
       - repeat <npc.flag[size]>:
-          - if <npc.flag[material_<def[slot]>].is[!=].to[air]>:
-            - narrate "<red><def[slot]><reset><&co> <yellow><npc.flag[material_<def[slot]>]><reset> <&co> <green><npc.flag[price_<def[slot]>]><reset>  <&co> <blue><npc.flag[lore1_<def[slot]>]> <&co><dark_purple> <npc.flag[lore2_<def[slot]>]><reset>"
-
-          - else:
-              - if <context.args.get[1].is[==].to[all]||false>:
-                  - narrate "<red><def[slot]><reset><&co> <yellow><npc.flag[material_<def[slot]>]><reset> <&co> <green><npc.flag[price_<def[slot]>]><reset>  <&co> <blue><npc.flag[lore1_<def[slot]>]> <&co><dark_purple> <npc.flag[lore2_<def[slot]>]><reset>"
-
+          - if <npc.flag[material_<def[slot]>].is[!=].to[air]> || <context.args.get[1].is[==].to[all]||false>:
+            #- narrate "<red><def[slot]><reset><&co> <yellow><npc.flag[material_<def[slot]>]><reset> <&co> <green><npc.flag[price_<def[slot]>]><reset>  <&co> <blue><npc.flag[lore1_<def[slot]>]> <&co><dark_purple> <npc.flag[lore2_<def[slot]>]><reset>"
+			- execute as_op 'tellraw <player.name> ["",{"text":"<def[slot]>. <def[ten].power[<tern[<def[slot].is[less].than[10]>].pass[2].fail[1]>].replace[0].with[ ].replace[1].with[ ]><&sp>", "color":"blue"}, 
+													   {"text":"| ", "color":"white"},
+													   {"text":"<npc.flag[material_<def[slot]>]> <def[ten].power[<def[fifteen].sub[<npc.flag[material_<def[slot]>].difference[ ]>]>].format_number[0].replace[0].with[ ].replace[1].with[ ]>", "color":"aqua", "clickEvent":{"action":"suggest_command","value":"/setmat <def[slot]> "}, "hoverEvent":{"action":"show_text", "value":{"text":"click to set material of this item", "color":"gold"}}}, 
+													   {"text":"| ", "color":"white"},
+													   {"text":"$<npc.flag[price_<def[slot]>]> <def[ten].power[<def[ten].sub[<npc.flag[price_<def[slot]>].difference[ ]>]>].format_number[0].replace[0].with[ ].replace[1].with[ ]>", "color":"gold", "clickEvent":{"action":"suggest_command","value":"/setprice <def[slot]> "}, "hoverEvent":{"action":"show_text", "value":{"text":"click to set price of this item", "color":"gold"}}},
+													   {"text":"| ", "color":"white"}
+													   ]'
+          #{"text":"<npc.flag[lore1_<def[slot]>]> ", "color":"blue", "clickEvent":{"action":"suggest_command","value":"/setlore <def[slot]> "}, "hoverEvent":{"action":"show_text", "value":{"text":"set lore 1", "color":"red"}}}
+		  #{"text":"lore2 <npc.flag[lore2_<def[slot]>]> ", "color":"light_purple", "clickEvent":{"action":"suggest_command","value":"/setlore <def[slot]> same "}, "hoverEvent":{"action":"show_text", "value":{"text":"set lore 2", "color":"red"}}}										   
+		  #
+		  #{"text":"PRICETAG", "color":"blue", "clickEvent":{"action":"suggest_command","value":"/setprice SLOT VALUE"}, "hoverEvent":{"action":"show_text", "value":{"text":"SET PRICE FOR MATERIAL", "color":"red"}}}
+		  
+	
           - define slot:+:1
 
+Add_Trader_To_Group_Command:
+    type: command
+    name: addtogroup
+	description: ...
+	usage: /...
+	permission: my.permission.node
+	permission message: Sorry, <player.name>, you can't use my command because you don't have the permission '<permission>'!
+	script:
+		
+		# npc defined in context
+		- if <npc||true>:
+			- narrate "<red><bold>[error:TraderBase]<reset><red> You need to select an NPC first with <underline><green>/npc select<reset><red> while near target npc"
+			- stop
+		- else:
+			# group name specified
+			- if !<context.args.get[1]||true>:
+			
+				# npc already in some group
+				- if <npc.has_flag[group]>:
+					
+					
+					# this group exists on server
+					- if <server.has_flag[<npc.flag[group]>]>:
+						- narrate "group registered on server"
+						# remove npc from previous group
+						- if <npc.flag[group].is[!=].to[<context.args.get[1]>]>:
+							- narrate "remove npc(<npc>) from prev group(<npc.flag[group]>) <server.flag[<npc.flag[group]>]>"
+							# - narrate "excluded from <server.flag[<npc.flag[group]>]> : <list[<server.flag[<npc.flag[group]>]>].exclude[<npc>]>"
+							- flag server <npc.flag[group]>:<list[<server.flag[<npc.flag[group]>]>].exclude[<npc>]>
+							# - narrate "removed. <server.flag[<npc.flag[group]>]>"
+							# - narrate "is group <server.flag[<npc.flag[group]>]> empty <server.flag[<npc.flag[group]>].is[==].to[li@]>"
+							- if <server.flag[<npc.flag[group]>].is[==].to[li@]>:
+								- narrate "<npc.flag[group]> is empty: <server.flag[<npc.flag[group]>]>"
+								- flag server "<npc.flag[group]>:!"
+								- narrate "<dark_green>group <npc.flag[group]> now is empty. remove it from server group list."
+								- flag server "groups:<list[<server.flag[groups]>].exclude[<npc.flag[group]>]>"
+								
+								
+				- if <server.has_flag[<context.args.get[1]>]>:
+					
+					
+					- if !<list[<server.flag[<context.args.get[1]>]>].contains[<npc>]>:
+						- narrate "<gray>'<npc>' <aqua>added to group <gray>'<context.args.get[1]>'"
+						#- narrate "raw member list <server.flag[<context.args.get[1]>]>. list including new member <server.flag[<context.args.get[1]>]>|<npc>"
+						- flag server "<context.args.get[1]>:<server.flag[<context.args.get[1]>]>|<npc>"
+						
+						
+							
+						- flag npc "group:<context.args.get[1]>"
+						
+		
+						# look for price defaults
+						- foreach <list[<server.flag[<context.args.get[1]>]>]>:
+							- define member <[value]>
+							- define slot 1
+							- repeat <npc.flag[size]>:
+								- if <def[member].as_npc.flag[price_<def[slot]>]||true>:
+									# npc price is null
+									- define crunch 1
+								- else:
+									#- narrate "item <def[slot]> has price <def[member].as_npc.flag[price_<def[slot]>]>"
+									#- narrate <def[member].as_npc.flag[price_<def[slot]>]>
+									- flag npc "price_<def[slot]>:<def[member].as_npc.flag[price_<def[slot]>]>"
+								- define slot:+:1
+						
+						# look for lore defaults
+						- foreach <list[<server.flag[<context.args.get[1]>]>]>:
+							- define member <[value]>
+							- define slot 1
+							- repeat <npc.flag[size]>:
+								#- narrate "lore <def[member]> <dark_red><def[slot]>"
+								- if <def[member].as_npc.flag[lore1_<def[slot]>]||true>:
+									# npc lore is null
+									- define crunch 1
+								- else:
+									#- narrate "item <def[slot]> has lore <def[member].as_npc.flag[lore1_<def[slot]>]>"
+									#- narrate <def[member].as_npc.flag[lore1_<def[slot]>]>
+									- flag npc "lore1_<def[slot]>:<def[member].as_npc.flag[lore1_<def[slot]>]>"
+								
+								- if <def[member].as_npc.flag[lore1_<def[slot]>]||true>:
+									# npc lore is null
+									- define crunch 1
+								- else:
+									#- narrate "item <def[slot]> has lore <def[member].as_npc.flag[lore2_<def[slot]>]>"
+									#- narrate <def[member].as_npc.flag[lore2_<def[slot]>]>
+									- flag npc "lore2_<def[slot]>:<def[member].as_npc.flag[lore2_<def[slot]>]>"
+								
+								- define slot:+:1
+							
+						# look for material defaults
+						- foreach <list[<server.flag[<context.args.get[1]>]>]>:
+							
+							- define member <[value]>
+							- define slot 1
+							- repeat <npc.flag[size]>:
+								- if <def[member].is[==].to[<npc>]>:
+									# skip this repeat loop
+									- stop
+								
+								#- narrate "mytest <def[member]> <dark_red><def[slot]>"
+								- if  <def[member].as_npc.flag[material_<def[slot]>]||true>:
+									#- narrate "something went wrong npc <npc> member <def[member]> '42352'"
+									- define crunch 1
+								- else:
+									
+									- if <def[member].flag[material_<def[slot]>].is[!=].to[air]>:
+								
+										#- narrate "member defined? <def[member]>"
+										- flag npc "material_<def[slot]>:<def[member].flag[material_<def[slot]>]||gold_ingot>"
+										- narrate "item <def[slot]> has material___ <def[member].flag[material_<def[slot]>]>"
+										#- narrate <def[member].as_npc.flag[lore1_<def[slot]>]>
+										
+								- define slot:+:1
+
+					- else:
+						- narrate "<red>group <gray>'<context.args.get[1]>' <red>already has member <gray>'<npc>'"
+					
+				# create new group	
+				- else:
+					- narrate "registered new group <context.args.get[1]>"
+					- narrate "list was <server.flag[groups]||<list[]>>"
+					- flag server "groups:<server.flag[groups]||<list[]>>|<context.args.get[1]>"
+					- narrate "now it is <server.flag[groups]>"
+					- flag server "<context.args.get[1]>:<list[<npc>]>"
+					- flag npc "group:<context.args.get[1]>"
+					- narrate "<aqua>created group <gray>'<context.args.get[1]>' <aqua>with <gray>'<npc>' <aqua>added."
+			- else:
+				- narrate "angry message"
+				
+				
+				
+Edit_World_Flag_Command:
+    type: command
+    name: wflag
+	description: ...
+	usage: /...
+	permission: my.permission.node
+	permission message: Sorry, <player.name>, you can't use my command because you don't have the permission '<permission>'!
+	script:
+		- if <context.args.get[1].is[==].to[set]>:
+			- flag server "<context.args.get[2]>:<context.args.get[3]>"
+			- narrate <server.flag[<context.args.get[2]>]>
+		- if <context.args.get[1].is[==].to[del]>:
+			- flag server "<context.args.get[2]>:!"
+			- narrate "deleted"
+		- if <context.args.get[1].is[==].to[get]>:
+			- narrate <server.flag[<context.args.get[2]>]>
 Help_Me_Command:
   type: command
   name: traderhelp
@@ -538,3 +738,92 @@ Help_Me_Command:
     - narrate "<white><bold>/edittrades"
     - narrate "<white><bold>/setmode <&lt><green>sell|buy<reset><&gt>"
     - narrate "<white><bold>/setmat <&lt><green>slot<reset><&gt> <&lt><green>material<reset><&gt>"
+	
+Edit_Server_Groups_Command:
+  type: command
+  name: groups
+  description: prints out some commands
+  usage: /groups
+  permission: my.permission.node
+  permission message: Sorry, <player.name>, you can't use my command because you don't have the permission '<permission>'!
+  script:
+	- if <context.args.get[1].is[==].to[get]>:
+		- if <context.args.get[2].is[==].to[members]>:
+			- foreach <list[<server.flag[groups]>]>:
+				- define group <[value]>
+				- narrate "<dark_gray>group <dark_red><def[group]>"
+				- foreach <list[<server.flag[<[value]>]>]>:
+					- narrate "<blue><[loop_index]>. <aqua>member of <gray><def[group]><aqua>: <gray><[value]>"
+		- else:
+			- if <context.args.get[2].is[==].to[names]>:
+				- foreach <list[<server.flag[groups]>]>:
+					- narrate "<blue><[loop_index]>. <aqua>group: <gray><[value]>"
+
+NPC_Clear_Command:
+	type: command
+    name: clearslots
+    description: ...
+    usage: /clearslots (start) (end)<n>/clearslots [start] [end] "sync"
+    permission: my.permission.node
+    permission message: Sorry, <player.name>, you can't use my command because you don't have the permission '<permission>'!
+    script:
+		- if <npc||true>:
+			- narrate "<red><bold>[error:TraderBase]<reset><red> You need to select an NPC first with <underline><green>/npc select<reset><red> while near target npc"
+			- stop
+		
+		- else:
+			- if !<context.args.get[1]||true>:
+				- if <context.args.get[1].is_integer>:
+					- define start_idx <context.args.get[1]>
+				- else:
+					- narrate "<red> start slot<gray> '<context.args.get[1]>'<red> must be integer"
+					- stop
+			- else:
+				- define start_idx 1
+				
+				
+			- if !<context.args.get[1]||true>:
+				- if <context.args.get[2].is_integer>:
+					- define end_idx <context.args.get[2]>
+				- else:
+					- narrate "<red> end slot<gray> '<context.args.get[2]>'<red> must be integer"
+					- stop
+			- else:
+				- define end_idx <npc.flag[size]>
+			
+			- define slot <def[start_idx]>
+			- repeat <def[end_idx].sub[<def[slot]>]>:
+				
+				- if <context.args.get[3].is[==].to[sync]>:
+					- if <npc.has_flag[group]> && <server.has_flag[<npc.flag[group]>]>:
+						- if <[value].is[==].to[1]>:
+							- narrate "<aqua>updating group..."
+						- foreach <list[<server.flag[<npc.flag[group]>]>]>:
+							- flag <[value]> "material_<def[slot]>:air" 
+				- else:
+					- flag npc "material_<def[slot]>:air"
+				- define slot:+:1
+			- narrate "<aqua>Cleared <def[end_idx].sub[<def[start_idx]>]> slots of <gray>'<npc>'s'<aqua> inventory."
+			
+			
+			- if <npc.has_flag[group]> && <server.has_flag[<npc.flag[group]>]>:
+				
+				- if <context.args.size.is[more].than[2]> && <context.args.get[3].is[==].to[sync]>:
+					- narrate "<aqua>group <gray>'<npc.flag[group]>'<aqua> was updated."
+				- else:
+					- narrate "<aqua>group <gray>'<npc.flag[group]>'<aqua> was not edited."
+		
+					
+Test_Command:
+#/tellraw @p ["",{"text":"Yes","color":"green","bold":"true","clickEvent":{"action":"run_command","value":"/tellraw @p {\"text\":\"Confirmed!\",\"color\":\"green\"}"},"hoverEvent":{"action":"show_text","value":{"text":"","extra":[{"text":"Confirm","color":"green"}]}}},{"text":"/","color":"dark_gray","bold":"false"},{"text":"No","color":"red","bold":"true","clickEvent":{"action":"run_command","value":"/tellraw @p {\"text\":\"Cancelled\",\"color\":\"red\"}"},"hoverEvent":{"action":"show_text","value":{"text":"","extra":[{"text":"Cancel","color":"red"}]}}}]				
+	  type: command
+	  name: test
+	  description: prints out some commands
+	  usage: /groups
+	  permission: my.permission.node
+	  permission message: Sorry, <player.name>, you can't use my command because you don't have the permission '<permission>'!
+	  script:
+		- execute as_op 'tellraw <player.name> ["", {"text":"PRICETAG", "color":"blue", "clickEvent":{"action":"suggest_command","value":"/setprice SLOT VALUE"}, "hoverEvent":{"action":"show_text", "value":{"text":"SET PRICE FOR MATERIAL", "color":"red"}}}, {"text":"PRICETAG", "color":"blue", "clickEvent":{"action":"suggest_command","value":"/setprice SLOT VALUE"}, "hoverEvent":{"action":"show_text", "value":{"text":"SET PRICE FOR MATERIAL", "color":"red"}}}]'
+		#["",{"text":"price:","color":"blue","bold":"true","clickEvent":{"action":"suggest_command","value":"/setprice SLOT VALUE"},}]"
+
+
