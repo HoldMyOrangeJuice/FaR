@@ -71,7 +71,7 @@ public class Main extends JavaPlugin implements Listener
         InputStream inputStream=null;
         try {
             Properties prop = new Properties();
-            String propFileName = "D:\\myFignya\\programs\\FaR server\\Server Enviroment\\plugins\\config.properties";
+            String propFileName = "config.properties";
 
             inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
 
@@ -96,19 +96,29 @@ public class Main extends JavaPlugin implements Listener
     {
         Location loc = e.getPlayer().getLocation();
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-        for (org.bukkit.World world : Bukkit.getWorlds())
-        {
-            RegionManager regions = container.get(BukkitAdapter.adapt( world ));
+
+        RegionManager regions = container.get(BukkitAdapter.adapt( e.getWorld() ));
+
+        if (regions != null) {
+
             Map<String, ProtectedRegion> regionMap = regions.getRegions();
-            for (ProtectedRegion region : regionMap.values())
-            {
-                for(Flag flag : region.getFlags().keySet())
-                {
-                    if (flag.getName().equals("raid") && region.getFlag(flag).toString().equals("DENY"))
-                    {
-                        if(region.contains(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()))
-                        {
-                            e.setCancelled(true);
+
+            if (regionMap.isEmpty()) return;
+
+            for (ProtectedRegion region : regionMap.values()) {
+                if (region == null) continue;
+                for (Flag flag : region.getFlags().keySet()) {
+                    if (flag == null) continue;
+                    if (region.getFlag(flag) != null) {
+                        try {
+                            if (flag.getName().equals("raid") && region.getFlag(flag).toString().equals("DENY")) {
+                                if (region.contains(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ())) {
+                                    e.setCancelled(true);
+                                    return;
+                                }
+                            }
+                        } catch (Exception ex) {
+                            System.out.println("NORAID caused " + ex);
                         }
                     }
                 }
