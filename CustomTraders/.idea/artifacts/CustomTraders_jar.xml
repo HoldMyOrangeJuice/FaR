@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="CustomTraders:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/CustomTraders_jar</output-path>
+    <root id="archive" name="CustomTraders.jar">
+      <element id="module-output" name="CustomTraders" />
+    </root>
+  </artifact>
+</component>

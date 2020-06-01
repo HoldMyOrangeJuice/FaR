@@ -1,0 +1,11 @@
+name: CustomTraders
+main: CustomTradersMain
+version: 1.0.0
+
+depend:
+  - Citizens
+
+api-version: "1.13"
+commands:
+  trader:
+    description: main command
