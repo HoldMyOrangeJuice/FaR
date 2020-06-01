@@ -308,7 +308,6 @@ public class Trader extends Trait
         {
             if (npc!= this.npc && npc.hasTrait(Trader.class) && npc.getTrait(Trader.class).group!=null && npc.getTrait(Trader.class).group.equals(this.group))
             {
-                Bukkit.getServer().broadcastMessage("found another group member " + npc);
                 this.item_names = npc.getTrait(Trader.class).item_names;
                 this.disp_names = npc.getTrait(Trader.class).disp_names;
                 this.item_lore = npc.getTrait(Trader.class).item_lore;
@@ -455,7 +454,6 @@ public class Trader extends Trait
 
                 if (clicked_item==null || clicked_item.getType() == Material.AIR)
                 {
-                    Bukkit.getServer().broadcastMessage("mat is null " + slot + "clicked item " + clicked_item);
                     event.setCancelled(true);
                     return;
                 }
@@ -463,24 +461,19 @@ public class Trader extends Trait
 
                 if (this.mode.equals("sell"))
                 {
-                    Bukkit.getServer().broadcastMessage(""+clicked_item);
                     ItemStack item_to_give;
                     if (get_item_material(slot)!=null && !get_item_material(slot).equals("air"))
                     {
                         item_to_give = new ItemStack(Material.valueOf(get_item_material(slot).toUpperCase()), 1);
-                        Bukkit.getServer().broadcastMessage("giving custom item " + Material.valueOf(get_item_material(slot).toUpperCase()));
                     }
                     else
                     {
-                        Bukkit.getServer().broadcastMessage("giving same item " + clicked_item.getType());
                         item_to_give = new ItemStack(clicked_item.getType(), 1);
                     }
 
                     ItemMeta meta = item_to_give.getItemMeta();
-                    Bukkit.getServer().broadcastMessage("meta " + meta);
                     if (get_item_name(slot)!=null && !get_item_name(slot).equals(""))
                     {
-                        Bukkit.getServer().broadcastMessage("item name " + get_item_name(slot) );
                         meta.setDisplayName(parseString(get_item_name(slot), slot));
                     }
 

@@ -19,7 +19,7 @@ public class CTrader implements CommandExecutor
     public boolean onCommand(CommandSender sender, Command command, String label, String[] arguments_raw)
     {
         String[] args = handle_args(arguments_raw);
-        Bukkit.getServer().broadcastMessage("raw "+ Arrays.toString(arguments_raw) + " processed " + Arrays.toString(args));
+       // Bukkit.getServer().broadcastMessage("raw "+ Arrays.toString(arguments_raw) + " processed " + Arrays.toString(args));
 
         player = sender.getServer().getPlayer(sender.getName());
         selectedNPC = CitizensAPI.getDefaultNPCSelector().getSelected(sender);
