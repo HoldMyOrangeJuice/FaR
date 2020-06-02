@@ -1,0 +1,22 @@
+name: CustomRaid
+version: 2.0.1
+main: HoldMyAppleJuice.CustomRaids
+author: HoldMyAppleJuice
+
+depend:
+  - Citizens
+commands:
+  highlight:
+    description: ...
+  craid:
+    description: ...
+  raidp:
+    description: ...
+  trader:
+    description: ...
+  raider:
+    description: ...
+  participant:
+    description: ...
+
+api-version: "1.13"

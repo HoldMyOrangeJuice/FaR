@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="CustomRaid:jar">
+    <output-path>$PROJECT_DIR$/../Server Enviroment/plugins</output-path>
+    <root id="archive" name="CustomRaid.jar">
+      <element id="module-output" name="CustomRaid" />
+    </root>
+  </artifact>
+</component>
