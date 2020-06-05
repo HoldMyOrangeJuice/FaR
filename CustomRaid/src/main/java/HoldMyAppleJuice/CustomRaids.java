@@ -2,8 +2,10 @@ package HoldMyAppleJuice;
 
 import HoldMyAppleJuice.IO.ConfigManager;
 import HoldMyAppleJuice.comamnds.*;
+import HoldMyAppleJuice.raid.managers.RaidManager;
 import HoldMyAppleJuice.raid.raiders.traits.*;
 import HoldMyAppleJuice.raid.villagers.traits.Trader;
+import net.citizensnpcs.api.CitizensAPI;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,6 +17,7 @@ public class CustomRaids extends JavaPlugin
 {
     public static CustomRaids plugin;
     public static ConfigManager config;
+    public final static RaidManager listener = new RaidManager();
 
     public CustomRaids()
     {
@@ -33,25 +36,24 @@ public class CustomRaids extends JavaPlugin
 
         config = new ConfigManager(file, conf);
 
-        getCommand("highlight").setExecutor(new Highlight());
-        getCommand("craid").setExecutor(new ForceRaid());
+        // OOF
+        CitizensAPI.getTraitFactory().registerTrait(net.citizensnpcs.api.trait.TraitInfo.create(RaidParticipant.class).withName("trader_raid_participant"));
+        CitizensAPI.getTraitFactory().registerTrait(net.citizensnpcs.api.trait.TraitInfo.create(Trader.class).withName("trader"));
+        CitizensAPI.getTraitFactory().registerTrait(net.citizensnpcs.api.trait.TraitInfo.create(ArcherTrait.class).withName("archer"));
+        CitizensAPI.getTraitFactory().registerTrait(net.citizensnpcs.api.trait.TraitInfo.create(SupportTrait.class).withName("support"));
+        CitizensAPI.getTraitFactory().registerTrait(net.citizensnpcs.api.trait.TraitInfo.create(DamagerTrait.class).withName("damager"));
+        CitizensAPI.getTraitFactory().registerTrait(net.citizensnpcs.api.trait.TraitInfo.create(TankTrait.class).withName("tank"));
+        CitizensAPI.getTraitFactory().registerTrait(net.citizensnpcs.api.trait.TraitInfo.create(MarksmanTrait.class).withName("marksman"));
+
+        getCommand("craid").setExecutor(new CRaid());
         getCommand("raider").setExecutor(new CRaider());
-        net.citizensnpcs.api.CitizensAPI.getTraitFactory().registerTrait(net.citizensnpcs.api.trait.TraitInfo.create(RaidParticipant.class).withName("trader_raid_participant"));
-        net.citizensnpcs.api.CitizensAPI.getTraitFactory().registerTrait(net.citizensnpcs.api.trait.TraitInfo.create(Trader.class).withName("trader"));
-        //net.citizensnpcs.api.CitizensAPI.getTraitFactory().registerTrait(net.citizensnpcs.api.trait.TraitInfo.create(Raider.class).withName("raider"));
-
-        net.citizensnpcs.api.CitizensAPI.getTraitFactory().registerTrait(net.citizensnpcs.api.trait.TraitInfo.create(ArcherTrait.class).withName("archer"));
-        System.out.println("------");
-        net.citizensnpcs.api.CitizensAPI.getTraitFactory().registerTrait(net.citizensnpcs.api.trait.TraitInfo.create(SupportTrait.class).withName("support"));
-        net.citizensnpcs.api.CitizensAPI.getTraitFactory().registerTrait(net.citizensnpcs.api.trait.TraitInfo.create(DamagerTrait.class).withName("damager"));
-        net.citizensnpcs.api.CitizensAPI.getTraitFactory().registerTrait(net.citizensnpcs.api.trait.TraitInfo.create(TankTrait.class).withName("tank"));
-        net.citizensnpcs.api.CitizensAPI.getTraitFactory().registerTrait(net.citizensnpcs.api.trait.TraitInfo.create(MarksmanTrait.class).withName("marksman"));
-
-        getCommand("raidp").setExecutor(new SpawnRaidParticipant());
         getCommand("participant").setExecutor(new CParticipant());
 
         getCommand("trader").setExecutor(new CTrader());
         getCommand("trader").setTabCompleter(new CTraiderAutocomplete());
+
+        // actually crunch
+        getServer().getPluginManager().registerEvents(listener, this);
     }
 
 }

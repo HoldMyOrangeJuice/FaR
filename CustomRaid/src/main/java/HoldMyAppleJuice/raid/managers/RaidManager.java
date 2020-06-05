@@ -1,10 +1,14 @@
 package HoldMyAppleJuice.raid.managers;
 
+
+import HoldMyAppleJuice.CustomRaids;
+import HoldMyAppleJuice.IO.ConfigManager;
 import HoldMyAppleJuice.raid.RaidType;
 import HoldMyAppleJuice.raid.raiders.traits.Raider;
 import HoldMyAppleJuice.raid.raiders.types.RaiderType;
 import HoldMyAppleJuice.raid.villagers.traits.RaidParticipant;
 import HoldMyAppleJuice.raid.villagers.traits.Trader;
+import jdk.nashorn.internal.runtime.regexp.joni.Config;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Bukkit;
@@ -13,6 +17,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import HoldMyAppleJuice.raid.raids.Raid;
@@ -20,15 +26,37 @@ import HoldMyAppleJuice.raid.raids.ZombieRaid;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EventListener;
 import java.util.HashMap;
 
-public class RaidManager
+public class RaidManager implements Listener
 {
+    public static HashMap<Integer, Raid>raidsInProgress = new HashMap<Integer, Raid>();
 
-    public static void startRaid(Location location, RaidType type)
+    public RaidManager()
     {
+//        Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(CustomRaids.plugin, new Runnable() {
+//            public void run() {
+//                if (Math.random() < 0.2)
+//                {
+//                    CustomRaids.config.load("Raid.anchors");
+//                    Location raid_anchor;
+//                    startRaid()
+//                }
+//            }
+//        })
+    }
+
+    public static boolean startRaid(Location location, RaidType type)
+    {
+        if (RaidManager.getParticipantsNearby(location, 100).size() == 0)
+        {
+            return false;
+        }
+
         Raid raid = new ZombieRaid(type, location);
-        //getParticipantsNearby(location, 100);
+        raidsInProgress.put(raid.hashCode(), raid);
+        return true;
     }
 
     public static void highlightVillagersNearby(Location loc, Integer radius)
@@ -60,7 +88,7 @@ public class RaidManager
                     npc.hasTrait(RaidParticipant.class) )
             {
                 npc_defenders.add(npc);
-                location.getWorld().spawn(npc.getEntity().getLocation(), Firework.class);
+                //location.getWorld().spawn(npc.getEntity().getLocation(), Firework.class);
             }
         }
         return npc_defenders;
@@ -92,10 +120,21 @@ public class RaidManager
                         npc.hasTrait(trait) )
                 {
                     raiders.add(npc);
-                    loc.getWorld().spawn(npc.getEntity().getLocation(), Firework.class);
+                    //loc.getWorld().spawn(npc.getEntity().getLocation(), Firework.class);
                 }
             }
         }
         return raiders;
+    }
+    public static RaiderType getRaiderType(NPC npc)
+    {
+        for (RaiderType type : RaiderType.values())
+        {
+            if (npc.hasTrait(type.get_trait()))
+            {
+                return type;
+            }
+        }
+        return null;
     }
 }

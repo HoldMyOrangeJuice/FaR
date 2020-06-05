@@ -1,6 +1,7 @@
 package HoldMyAppleJuice.raid.raids;
 
 import HoldMyAppleJuice.CustomRaids;
+
 import HoldMyAppleJuice.raid.managers.PlayerKarmaManager;
 import HoldMyAppleJuice.raid.managers.RaidManager;
 import HoldMyAppleJuice.raid.raiders.traits.ArcherTrait;
@@ -28,37 +29,29 @@ public abstract class Raid implements Listener
     public ArrayList<NPC> alive_raiders = new ArrayList<NPC>();
     public RaidType raidType;
     public ArrayList<NPC> alive_defenders = new ArrayList<NPC>();
+    public ArrayList<Player> players_participated = new ArrayList<Player>();
     public boolean active;
     public BossBar raidStatusBar;
 
     public Raid(RaidType type, Location at)
     {
+        this.active = true;
         this.raidType = type;
-        location = at;
-        start();
-        active = true;
-        Bukkit.getServer().broadcastMessage("Started raid " + this.hashCode());
+        this.location = at;
 
-        //add_raiders(RaidManager.getRaidersNearby(location, 100));
-        // raiders added on spawn
+        start();
+        Bukkit.getServer().broadcastMessage(ChatColor.DARK_GRAY + "[Рейд] >> " + ChatColor.DARK_PURPLE + "Рейд начат на координатах" + ChatColor.DARK_RED + "x:" +  + location.getBlockX() + " y:"  + location.getBlockY()+ ChatColor.DARK_PURPLE + "! Защити торговцев и подними репутацию!");
+
+        // register defenders on raid spawn
         add_victims(RaidManager.getParticipantsNearby(location, 300));
 
         raidStatusBar = Bukkit.createBossBar("Raiders left: " + alive_raiders.size() + " Defenders left: " + alive_defenders.size(), BarColor.BLUE, BarStyle.SEGMENTED_20);
 
+        //
         for (Player player : PlayerKarmaManager.getPlayersNearby(location, 300))
         {
             raidStatusBar.addPlayer(player);
-
         }
-
-        for (NPC def : alive_defenders)
-        {
-            Bukkit.getServer().broadcastMessage("init defender added " + def.getId());
-        }
-
-
-        //player_defenders_nearby.addAll(PlayerKarmaManager.getPlayersNearby(location, 100));
-        //player_defenders.addAll(Bukkit.getServer().getOnlinePlayers());
 
         CustomRaids.plugin.getServer().getPluginManager().registerEvents(this, CustomRaids.plugin);
     }
@@ -66,26 +59,35 @@ public abstract class Raid implements Listener
     public abstract void start();
     public abstract void loose();
     public abstract void win();
+    public abstract void onEnd();
 
     public abstract void handle_raider_death(NPC raider);
     public abstract void handle_victim_death(NPC victim);
     public abstract void handle_player_damage_raider(Player player, NPC raider, Double damage);
     public abstract void handle_player_kill_raider(Player player, NPC raider, Double damage);
 
+
     @EventHandler
     public void onNPCdamage(NPCDamageByEntityEvent event)
     {
+        if (!active)return;
         NPC npc = event.getNPC();
         if (belongs_to_raid(npc) && event.getDamager() instanceof Player)
         {
+            Player player = (Player) event.getDamager();
+            if (!players_participated.contains(player))
+            {
+                players_participated.add(player);
+                raidStatusBar.addPlayer(player);
+            }
             if ( ((LivingEntity)(npc.getEntity())).getHealth()-event.getDamage()>0 ) {
                 // raider damaged by player
-                handle_player_damage_raider((Player) event.getDamager(), event.getNPC(), event.getDamage());
+                handle_player_damage_raider(player, event.getNPC(), event.getDamage());
             }
             else
             {
                 // raider killed by player
-                handle_player_kill_raider((Player)event.getDamager(), npc, event.getDamage());
+                handle_player_kill_raider(player, npc, event.getDamage());
             }
         }
     }
@@ -94,17 +96,16 @@ public abstract class Raid implements Listener
     @EventHandler
     public void onNPCDeath(NPCDeathEvent event)
     {
+        if (!active)return;
         NPC npc = event.getNPC();
         if (belongs_to_raid(npc))
         {
             // raider died
-
-            //add_raiders(RaidManager.getRaidersNearby(location, 100));
-            remove_raider(npc);
             handle_raider_death(npc);
-            Bukkit.getServer().broadcastMessage("" + ChatColor.BOLD + ""+ ChatColor.DARK_RED + alive_raiders.size() + " raiders left");
+            remove_raider(npc);
             update_bar();
-            if (alive_raiders.isEmpty() && active)
+
+            if (alive_raiders.isEmpty())
             {
                 win();
                 end();
@@ -113,13 +114,11 @@ public abstract class Raid implements Listener
         if (npc.hasTrait(RaidParticipant.class))
         {
             // villager died
-            //add_victims(RaidManager.getParticipantsNearby(location, 100));
             handle_victim_death(npc);
             remove_victim(npc);
-
-            Bukkit.getServer().broadcastMessage("" + ChatColor.BOLD + ""+ ChatColor.DARK_GREEN + alive_defenders.size() + " defenders left");
             update_bar();
-            if (alive_defenders.isEmpty() && active)
+
+            if (alive_defenders.isEmpty())
             {
                 loose();
                 end();
@@ -129,16 +128,23 @@ public abstract class Raid implements Listener
 
     public void end()
     {
+        if (!active)return;
+
+        onEnd();
+
+
         for (NPC raider : alive_raiders)
         {
             raider.destroy();
         }
         active = false;
+        RaidManager.raidsInProgress.remove(this.hashCode());
 
     }
 
     public void remove_bar()
     {
+
         for (Player player :  raidStatusBar.getPlayers())
         {
             raidStatusBar.removePlayer(player);
@@ -147,11 +153,13 @@ public abstract class Raid implements Listener
     }
     public void update_bar()
     {
+        if (!active)return;
         raidStatusBar.setTitle("Raiders left: " + alive_raiders.size() + " Defenders left: " + alive_defenders.size());
     }
 
     public void add_raiders(Iterable<NPC> raiders)
     {
+        if (!active)return;
         for (NPC raider : raiders)
         {
             add_raider(raider);
@@ -160,7 +168,7 @@ public abstract class Raid implements Listener
 
     public void add_raider(NPC raider)
     {
-
+        if (!active)return;
         //if (!raider.hasTrait(Raider.class))return;
         if (!raider.isSpawned())return;
         if (alive_raiders.contains(raider))return;
@@ -170,11 +178,10 @@ public abstract class Raid implements Listener
 
     public void remove_raider(NPC raider)
     {
-        Bukkit.getServer().broadcastMessage("remove raider from registry...");
+        if (!active)return;
 
         if (alive_raiders.contains(raider))
         {
-            Bukkit.getServer().broadcastMessage("removed.");
             alive_raiders.remove(raider);
             //dead_raiders.add(raider);
         }
@@ -182,17 +189,17 @@ public abstract class Raid implements Listener
 
     public void add_victim(NPC victim)
     {
-
+        if (!active)return;
         if (!victim.hasTrait(RaidParticipant.class))return;
         if (!victim.isSpawned())return;
         if (alive_defenders.contains(victim))return;
 
         this.alive_defenders.add(victim);
-        Bukkit.getServer().broadcastMessage("added victim " + victim.getId());
     }
 
     public void add_victims(Iterable<NPC> victims)
     {
+        if (!active)return;
         for (NPC victim : victims)
         {
             add_victim(victim);
@@ -200,20 +207,20 @@ public abstract class Raid implements Listener
     }
 
     public void remove_victim(NPC victim) {
+        if (!active)return;
         if (victim.isSpawned()) {
             victim.despawn();
         }
 
-        Bukkit.getServer().broadcastMessage("try to remove victim");
         while (alive_defenders.contains(victim)) {
             alive_defenders.remove(victim);
-            Bukkit.getServer().broadcastMessage("removed " + victim.getId());
         }
 
     }
 
     public boolean belongs_to_raid(NPC npc)
     {
+        if (!active)return false;
         for (NPC raider : alive_raiders)
         {
             if (npc == raider) {
@@ -225,6 +232,7 @@ public abstract class Raid implements Listener
 
     public HashSet<NPC> spawn_raiders()
     {
+        if (!active)return null;
         ArrayList<Location> possible_spawn_locations = new ArrayList<Location>();
 
         for (int x_offset = -this.raidType.get_spawn_radius(); x_offset <= this.raidType.get_spawn_radius(); x_offset ++) {
@@ -234,9 +242,9 @@ public abstract class Raid implements Listener
                     Location loc_stand = new Location(location.getWorld(), location.getBlockX() + x_offset, y - 1, location.getBlockZ() + z_offset);
                     Location loc_foot = new Location(location.getWorld(), location.getBlockX() + x_offset, y, location.getBlockZ() + z_offset);
                     Location loc_head = new Location(location.getWorld(), location.getBlockX() + x_offset, y + 1, location.getBlockZ() + z_offset);
-                    if (loc_stand.getWorld().getBlockAt(loc_stand).getType() != Material.AIR &&
-                            loc_foot.getWorld().getBlockAt(loc_foot).getType() == Material.AIR &&
-                            loc_head.getWorld().getBlockAt(loc_head).getType() == Material.AIR)
+                    if (loc_stand.getWorld().getBlockAt(loc_stand).getType().isSolid() &&
+                        loc_foot.getWorld().getBlockAt(loc_foot).getType() == Material.AIR &&
+                        loc_head.getWorld().getBlockAt(loc_head).getType() == Material.AIR)
                     {
                         possible_spawn_locations.add(loc_foot);
                         break;
@@ -252,14 +260,12 @@ public abstract class Raid implements Listener
             {
                 Location spawn_location = possible_spawn_locations.get((new Random()).nextInt(possible_spawn_locations.size()));
 
-                NPC raider = CitizensAPI.getNPCRegistry().createNPC(raider_type.get_entity(), "HP: " + raider_type.get_hp());
+                NPC raider = CitizensAPI.getNPCRegistry().createNPC(raider_type.get_entity(), raider_type.get_name() + " HP: " + raider_type.get_hp());
                 raiders.add(raider);
-                Bukkit.getServer().broadcastMessage("registering trait "+ raider_type.get_trait());
                 raider.addTrait(raider_type.get_trait());
                 raider.spawn(spawn_location);
                 this.add_raider(raider);
                 Raider.onEntitySpawn(raider, raider_type);
-
             }
         }
         return raiders;

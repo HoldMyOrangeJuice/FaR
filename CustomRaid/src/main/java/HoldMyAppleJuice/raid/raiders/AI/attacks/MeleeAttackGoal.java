@@ -16,7 +16,6 @@ public class MeleeAttackGoal implements RaiderAttackGoal {
     private NPC victim=null;
     private NPC raider;
     private RaiderType type;
-    private boolean crunch = true;
     public boolean is_attacking = false;
 
     public MeleeAttackGoal(NPC raider, RaiderType type)
@@ -51,8 +50,7 @@ public class MeleeAttackGoal implements RaiderAttackGoal {
         }
 
         ArrayList<NPC> potential_victims = RaidManager.getParticipantsNearby(raider.getEntity().getLocation(), 100);
-        for  (NPC victim : potential_victims)
-        {Bukkit.broadcastMessage("victim " + victim.getId() + victim + victim.getEntity());}
+
         if (potential_victims.size()>0)
         {
             NPC close_victim = null;
@@ -67,15 +65,11 @@ public class MeleeAttackGoal implements RaiderAttackGoal {
             }
             victim = close_victim;
             set_victim(close_victim);
-            crunch = true;
             is_attacking = true;
             return true;
         }
         else
         {
-            if (crunch){
-                crunch = false;
-            }
             is_attacking = false;
             return false;
         }

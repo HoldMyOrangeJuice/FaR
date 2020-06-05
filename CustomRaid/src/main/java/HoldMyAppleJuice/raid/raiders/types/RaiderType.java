@@ -22,6 +22,7 @@ public enum RaiderType
             new ItemStack(Material.GOLDEN_CHESTPLATE),
             new ItemStack(Material.GOLDEN_LEGGINGS),
             new ItemStack(Material.GOLDEN_BOOTS),
+            "Простой лучник",
             new ItemStack(Material.BOW),
             1.1d, 30d,1.2f,1, 50,
             ArcherTrait.class, ShootGoal.class
@@ -33,6 +34,7 @@ public enum RaiderType
             new ItemStack(Material.GOLDEN_CHESTPLATE),
             new ItemStack(Material.GOLDEN_LEGGINGS),
             new ItemStack(Material.GOLDEN_BOOTS),
+            "Прикольный лучник",
             new ItemStack( Material.BOW),
             1.3d, 20d,1.1f,50, 1,
             MarksmanTrait.class, ShootGoal.class
@@ -43,6 +45,7 @@ public enum RaiderType
             new ItemStack(Material.GOLDEN_CHESTPLATE),
             new ItemStack(Material.GOLDEN_LEGGINGS),
             new ItemStack(Material.GOLDEN_BOOTS),
+            "Жирный",
             new ItemStack(Material.WOODEN_AXE),
             0.3d, 200d,0.5f,1, 1,
             TankTrait.class, MeleeAttackGoal.class
@@ -54,6 +57,7 @@ public enum RaiderType
             new ItemStack(Material.GOLDEN_CHESTPLATE),
             new ItemStack(Material.GOLDEN_LEGGINGS),
             new ItemStack(Material.GOLDEN_BOOTS),
+            "Дровосек",
             new ItemStack(Material.DIAMOND_AXE),
         2d, 15d,0.9f, 1, 50,
             DamagerTrait.class, MeleeAttackGoal.class
@@ -65,6 +69,7 @@ public enum RaiderType
             new ItemStack(Material.GOLDEN_CHESTPLATE),
             new ItemStack(Material.GOLDEN_LEGGINGS),
             new ItemStack(Material.GOLDEN_BOOTS),
+            "Мутный тип",
             new ItemStack(Material.IRON_SWORD),
             0.8d, 20d, 1.4f, 1, 1,
             SupportTrait.class, HealGoal.class
@@ -76,6 +81,7 @@ public enum RaiderType
     ItemStack chest;
     ItemStack leg;
     ItemStack boots;
+    String name;
     ItemStack weapon;
     Double damage_modifier;
     Double max_hp;
@@ -91,6 +97,7 @@ public enum RaiderType
                ItemStack chest,
                ItemStack leg,
                ItemStack boots,
+               String name,
                ItemStack weapon,
                Double damage_modifier, Double max_hp, Float speed,
                Integer weapon_drop, Integer armor_drop,
@@ -102,6 +109,8 @@ public enum RaiderType
         this.chest = chest;
         this.leg = leg;
         this.boots = boots;
+
+        this.name = name;
 
         this.damage_modifier = damage_modifier;
         this.max_hp = max_hp;
@@ -156,6 +165,10 @@ public enum RaiderType
     public Class<?extends Goal> get_goal() {
         return this.goal;
     }
+    public String get_name()
+    {
+        return name;
+    }
 
     public void setup(NPC npc)
     {
@@ -173,6 +186,7 @@ public enum RaiderType
         //AttributeInstance speed = entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
         //speed.setBaseValue(get_speed());
     }
+
 
 
 }

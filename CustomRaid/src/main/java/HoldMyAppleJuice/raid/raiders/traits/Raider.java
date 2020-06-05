@@ -1,6 +1,7 @@
 package HoldMyAppleJuice.raid.raiders.traits;
 
 import HoldMyAppleJuice.CustomRaids;
+import HoldMyAppleJuice.raid.managers.RaidManager;
 import HoldMyAppleJuice.raid.raiders.AI.movement.MoveStuckAction;
 import HoldMyAppleJuice.raid.raiders.AI.attacks.RaiderAttackGoal;
 import HoldMyAppleJuice.raid.raiders.types.RaiderType;
@@ -166,7 +167,6 @@ public abstract class Raider extends Trait {
     {
         if (event.getNPC() != npc) return;
         event.getNPC().destroy();
-        Bukkit.getServer().broadcastMessage("destroy " + event.getNPC().getName());
     }
 
     @EventHandler
@@ -176,7 +176,8 @@ public abstract class Raider extends Trait {
         {
             if (CitizensAPI.getNPCRegistry().getNPC(event.getEntity()) == npc)
             {
-                npc.setName("HP: " + Math.floor(((LivingEntity)npc.getEntity()).getHealth()- event.getDamage()));
+                double hp = Math.floor(((LivingEntity)npc.getEntity()).getHealth()- event.getDamage());
+                npc.setName(RaidManager.getRaiderType(npc).get_name() + " HP: " + (hp<0?0:hp) );
             }
 
         }

@@ -68,10 +68,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="552" y="179" key="#Auto_Import/0.0.1920.1040@0.0.1920.1040" timestamp="1590683431306" />
-    <state x="765" y="237" key="#com.intellij.ide.util.MemberChooser" timestamp="1590998988986">
+    <state x="765" y="237" key="#com.intellij.ide.util.MemberChooser" timestamp="1591354553960">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="765" y="237" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1590998988986" />
+    <state x="765" y="237" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1591354553960" />
     <state x="616" y="446" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog" timestamp="1590578876177">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -80,10 +80,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="466" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1590998746847" />
-    <state x="690" y="268" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1590768963981">
+    <state x="690" y="268" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1591366923437">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="690" y="268" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1590768963981" />
+    <state x="690" y="268" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1591366923437" />
     <state x="719" y="274" key="FileChooserDialogImpl" timestamp="1591082591283">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -96,14 +96,14 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="419" y="107" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1590579003248" />
-    <state x="656" y="345" key="com.intellij.ide.util.TipDialog" timestamp="1591082566497">
+    <state x="656" y="345" key="com.intellij.ide.util.TipDialog" timestamp="1591351013651">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="656" y="345" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1591082566497" />
-    <state x="656" y="252" width="607" height="536" key="find.popup" timestamp="1590772258166">
+    <state x="656" y="345" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1591351013651" />
+    <state x="656" y="252" width="607" height="536" key="find.popup" timestamp="1591369245940">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="656" y="252" width="607" height="536" key="find.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1590772258166" />
+    <state x="656" y="252" width="607" height="536" key="find.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1591369245940" />
     <state x="342" y="223" key="new project wizard" timestamp="1591032151237">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -116,9 +116,9 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="616" y="240" key="run.anything.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1590582093793" />
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1590935551299">
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1591364660861">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1590935551299" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1591364660861" />
   </component>
 </project>

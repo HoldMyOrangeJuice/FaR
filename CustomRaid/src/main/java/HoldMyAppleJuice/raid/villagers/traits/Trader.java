@@ -4,11 +4,9 @@ import HoldMyAppleJuice.CustomRaids;
 import HoldMyAppleJuice.raid.managers.PlayerKarmaManager;
 import HoldMyAppleJuice.utils.Chat;
 import HoldMyAppleJuice.utils.ChatPrefix;
-import com.sun.deploy.uitoolkit.impl.awt.AWTWindowFactory;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.event.NPCRightClickEvent;
 import net.citizensnpcs.api.npc.NPC;
-import net.citizensnpcs.api.persistence.Persist;
 import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.util.DataKey;
 import org.bukkit.Bukkit;
@@ -23,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,16 +48,16 @@ public class Trader extends Trait
     public HashMap<Integer, List<String>> disp_lore = new HashMap<Integer, List<String>>();
     public HashMap<Integer, List<String>> item_lore = new HashMap<Integer, List<String>>();
 
-    public Integer max_gui_size = 54;
+    public Integer gui_size = 54;
     public Player edited_by = null;
     public Inventory trader_GUI;
     public String mode = "sell";
     public String inv_name = "this is inventory";
     public String trader_name = "Bob Ross";
-    public String group = null;
+    public String group = String.valueOf(Math.random());
+    public boolean karma_dependent=false;
 
-    // see the 'Persistence API' section
-    @Persist("trader") boolean automaticallyPersistedSetting = false;
+
 
     // Here you should load up any values you have previously saved (optional).
     // This does NOT get called when applying the trait for the first time, only loading onto an existing npc at server start.
@@ -71,30 +70,43 @@ public class Trader extends Trait
         trader_name = key.getString("trader_name");
         group = key.getString("group");
         mode = key.getString("mode");
+        karma_dependent = key.getBoolean("karma_dependent");
         // #-------------------------------------------# //
 
-        for (int i=0; i<max_gui_size; i++)
+        for (int i = 0; i< gui_size; i++)
         {
-            prices.put(i, key.getInt(price_field(i), 0));
-            disp_materials.put(i, key.getString(Dmat_field(i), "air"));
-            disp_names.put(i, key.getString(Dname_field(i)));
-            item_names.put(i, key.getString(Iname_field(i)));
-            item_materials.put(i, key.getString(Imat_field(i)));
+            if (key.getInt(price_field(i)) != 0)
+            {
+                prices.put(i, key.getInt(price_field(i)));
+            }
+            if (!key.getString(Dmat_field(i)).equals(""))
+            {
+                disp_materials.put(i, key.getString(Dmat_field(i)));
+            }
+            if (!key.getString(Dname_field(i)).equals(""))
+            {
+                disp_names.put(i, key.getString(Dname_field(i)));
+            }
+            if (!key.getString(Iname_field(i)).equals(""))
+            {
+                item_names.put(i, key.getString(Iname_field(i)));
+            }
+            if (!key.getString(Imat_field(i)).equals(""))
+            {
+                item_materials.put(i, key.getString(Imat_field(i)));
+            }
 
             Integer lore_line = 1;
             ArrayList<String>loaded_disp_lore=new ArrayList<String>();
             ArrayList<String>loaded_item_lore=new ArrayList<String>();
-            System.out.println(key.getString(Dlore_field(1, 1)));
-            System.out.println(Dlore_field(i, lore_line));
+
 
             while (!key.getString(Dlore_field(i, lore_line)).equals(""))
             {
                 loaded_disp_lore.add(key.getString(Dlore_field(i, lore_line)));
                 lore_line++;
             }
-
             disp_lore.put(i, loaded_disp_lore);
-
             lore_line = 1;
             while (!key.getString(Dlore_field(i, lore_line)).equals(""))
             {
@@ -112,76 +124,48 @@ public class Trader extends Trait
         key.setString("trader_name", trader_name);
         key.setString("group", group);
         key.setString("mode", mode);
+        key.setBoolean("karma_dependent", karma_dependent);
 
-        for (int i=0; i<max_gui_size; i++)
+        for (int i = 0; i< gui_size; i++)
         {
             // SAVE PRICES
             if (prices.containsKey(i))
             {
-                System.out.println("saving price " + price_field(i) + " " + " with " + prices.get(i) );
+
                 key.setInt(price_field(i), prices.get(i));
             }
-            else
-            {
-                System.out.println("no value for " + price_field(i));
-            }
-
             // SAVE DISPLAY MATERIALS
             if (disp_materials.containsKey(i))
             {
                 key.setString(Dmat_field(i), disp_materials.get(i));
-                System.out.println("saving mat " + Dmat_field(i) + " " + " with " + disp_materials.get(i) );
-            }
-            else
-            {
-                System.out.println("no value for " + Dmat_field(i));
+
             }
             // SAVE ITEM MATERIALS
             if (item_materials.containsKey(i))
             {
                 key.setString(Imat_field(i), item_materials.get(i));
-                System.out.println("saving mat " + Imat_field(i) + " " + " with " + item_materials.get(i) );
-            }
-            else
-            {
-                System.out.println("no value for " + Dmat_field(i));
-            }
 
+            }
             // SAVE DISPLAY NAMES
             if (disp_names.containsKey(i))
             {
                 key.setString(Dname_field(i), disp_names.get(i));
-                System.out.println("saving dname " + "display_name_"+i + " " + " with " + disp_names.get(i) );
-            }
-            else
-            {
-                System.out.println("no value for " + "display_name_" + i);
-            }
 
+            }
             // SAVE ITEM NAMES
             if (item_names.containsKey(i))
             {
                 key.setString(Iname_field(i), item_names.get(i));
-                System.out.println("saving iname " + Iname_field(i) + " with " + item_names.get(i) );
-            }
-            else
-            {
-                System.out.println("no value for " + Iname_field(i));
-            }
 
+            }
             // SAVE DISPLAY LORE
             if (disp_lore.containsKey(i))
             {
-                for (int line=0; line<disp_lore.get(i).size(); i++)
+                for (int line=0; line < disp_lore.get(i).size(); line++)
                 {
                     key.setString(Dlore_field(i, line+1), disp_lore.get(i).get(line));
                 }
             }
-            else
-            {
-                System.out.println("no value for " + Dlore_field(i, -1));
-            }
-
             // SAVE ITEM LORE
             if (item_lore.containsKey(i))
             {
@@ -190,11 +174,6 @@ public class Trader extends Trait
                     key.setString(Ilore_field(i, line), item_lore.get(i).get(line));
                 }
             }
-            else
-            {
-                System.out.println("no value for " + Ilore_field(i, -1));
-            }
-
         }
     }
     public boolean validate_args(Object ... args)
@@ -221,39 +200,46 @@ public class Trader extends Trait
     }
     public Integer get_raw_price(Integer slot)
     {
-        if (validate_args(slot))
+        if (validate_args(slot, this.prices.get(slot)) )
         {
             return this.prices.get(slot);
         }
-        return null;
+        return 0;
     }
 
     public Integer get_price(Integer slot, Player player)
     {
         // price player pays
-        Integer discount = getDiscount(player);
-        Integer price = null;
-        if (validate_args(slot))
+        if (karma_dependent)
         {
-            if (mode.equals("buy"))
+            Integer discount = getDiscount(player);
+            Integer price = 0;
+            if (validate_args(slot, this.prices.get(slot)))
             {
-                price = this.prices.get(slot) + discount;
-            }
-            else if (mode.equals("sell"))
-            {
-                price = this.prices.get(slot) - discount;
-            }
+                if (mode.equals("buy"))
+                {
+                    price = this.prices.get(slot) + discount;
+                }
+                else if (mode.equals("sell"))
+                {
+                    price = this.prices.get(slot) - discount;
+                }
 
-            if (price!= null && price <= 0)
-            {
-                return 1;
-            }
-            else
-            {
-                return price;
+                if (price!= null && price <= 0)
+                {
+                    return 1;
+                }
+                else
+                {
+                    return price;
+                }
             }
         }
-        return null;
+        if (validate_args(slot, this.prices.get(slot)))
+        {
+            return this.prices.get(slot);
+        }
+        return 0;
     }
 
 
@@ -275,6 +261,8 @@ public class Trader extends Trait
         return ChatPrefix.TRADER_ERROR + " invalid arguments";
 
     }
+
+    @Nullable
     public String get_disp_name(Integer slot)
     {
         return this.disp_names.get(slot);
@@ -290,6 +278,7 @@ public class Trader extends Trait
         return ChatPrefix.TRADER_ERROR + " invalid arguments";
 
     }
+    @Nullable
     public String get_item_name(Integer slot)
     {
         if (item_names.containsKey(slot))
@@ -311,7 +300,13 @@ public class Trader extends Trait
     }
     public String get_disp_material(Integer slot)
     {
-        return this.disp_materials.get(slot);
+        if (this.disp_materials.containsKey(slot))
+        {
+            return this.disp_materials.get(slot);
+        }
+        return Material.AIR.toString().toLowerCase();
+
+
     }
 
     public void set_disp_lore(Integer slot, List<String>lore)
@@ -321,7 +316,12 @@ public class Trader extends Trait
     }
     public List<String> get_disp_lore(Integer slot)
     {
-        return this.disp_lore.get(slot);
+        if (this.disp_lore.containsKey(slot))
+        {
+            return this.disp_lore.get(slot);
+        }
+        return new ArrayList<String>();
+
     }
     public void set_item_lore(Integer slot, List<String>lore)
     {
@@ -330,7 +330,9 @@ public class Trader extends Trait
     }
     public List<String> get_item_lore(Integer slot)
     {
-        return this.item_lore.get(slot);
+        if (this.item_lore.containsKey(slot))
+            return this.item_lore.get(slot);
+        return new ArrayList<String>();
     }
 
     public void set_item_material(Integer slot, String material)
@@ -340,24 +342,31 @@ public class Trader extends Trait
     }
     public String get_item_material(Integer slot)
     {
-        return this.item_materials.get(slot);
+        if (this.item_materials.containsKey(slot))
+            return this.item_materials.get(slot);
+        return get_disp_material(slot);
     }
 
 
     public void clone_group_inventory()
     {
+
         for (NPC npc : CitizensAPI.getNPCRegistry())
         {
             if (npc!= this.npc && npc.hasTrait(Trader.class) && npc.getTrait(Trader.class).group!=null && npc.getTrait(Trader.class).group.equals(this.group))
             {
+                Bukkit.getServer().broadcastMessage("clone group inv called");
                 Bukkit.getServer().broadcastMessage("found another group member " + npc);
-                this.item_names = npc.getTrait(Trader.class).item_names;
-                this.disp_names = npc.getTrait(Trader.class).disp_names;
-                this.item_lore = npc.getTrait(Trader.class).item_lore;
-                this.disp_lore = npc.getTrait(Trader.class).disp_lore;
-                this.prices = npc.getTrait(Trader.class).prices;
-                this.item_materials = npc.getTrait(Trader.class).item_materials;
-                this.disp_materials = npc.getTrait(Trader.class).disp_materials;
+                this.item_names = (HashMap<Integer, String>) npc.getTrait(Trader.class).item_names.clone();
+                this.disp_names = (HashMap<Integer, String>) npc.getTrait(Trader.class).disp_names.clone();
+                this.item_lore = (HashMap<Integer, List<String>>) npc.getTrait(Trader.class).item_lore.clone();
+                this.disp_lore = (HashMap<Integer, List<String>>) npc.getTrait(Trader.class).disp_lore.clone();
+                this.prices = (HashMap<Integer, Integer>) npc.getTrait(Trader.class).prices.clone();
+                this.item_materials = (HashMap<Integer, String>) npc.getTrait(Trader.class).item_materials.clone();
+                this.disp_materials = (HashMap<Integer, String>) npc.getTrait(Trader.class).disp_materials.clone();
+                // test
+                this.mode = npc.getTrait(Trader.class).mode;
+                this.karma_dependent = npc.getTrait(Trader.class).karma_dependent;
                 break;
             }
         }
@@ -371,15 +380,20 @@ public class Trader extends Trait
         }
         for (NPC npc : CitizensAPI.getNPCRegistry())
         {
-            if (npc.hasTrait(Trader.class) && npc.getTrait(Trader.class).group!=null && npc.getTrait(Trader.class).group.equals(this.group))
+            if (npc != this.npc && npc.hasTrait(Trader.class) && npc.getTrait(Trader.class).group!=null && npc.getTrait(Trader.class).group.equals(this.group))
             {
-                npc.getTrait(Trader.class).item_names = this.item_names;
-                npc.getTrait(Trader.class).disp_names = this.disp_names;
-                npc.getTrait(Trader.class).item_lore = this.item_lore;
-                npc.getTrait(Trader.class).disp_lore = this.disp_lore;
-                npc.getTrait(Trader.class).prices = this.prices;
-                npc.getTrait(Trader.class).item_materials = this.item_materials;
-                npc.getTrait(Trader.class).disp_materials = this.disp_materials;
+                Bukkit.getServer().broadcastMessage("update_group_inventory called");
+                Bukkit.getServer().broadcastMessage("npc " + npc.getName() +  "has trait trader" + npc.getTrait(Trader.class).group.equals(this.group) + " " + npc.getTrait(Trader.class).group + " = " + this.group);
+                npc.getTrait(Trader.class).item_names = (HashMap<Integer, String>) this.item_names.clone();
+                npc.getTrait(Trader.class).disp_names = (HashMap<Integer, String>) this.disp_names.clone();
+                npc.getTrait(Trader.class).item_lore = (HashMap<Integer, List<String>>) this.item_lore.clone();
+                npc.getTrait(Trader.class).disp_lore = (HashMap<Integer, List<String>>) this.disp_lore.clone();
+                npc.getTrait(Trader.class).prices = (HashMap<Integer, Integer>) this.prices.clone();
+                npc.getTrait(Trader.class).item_materials = (HashMap<Integer, String>) this.item_materials.clone();
+                npc.getTrait(Trader.class).disp_materials = (HashMap<Integer, String>) this.disp_materials.clone();
+
+                npc.getTrait(Trader.class).mode = this.mode;
+                npc.getTrait(Trader.class).karma_dependent = this.karma_dependent;
                 count ++;
             }
         }
@@ -388,52 +402,80 @@ public class Trader extends Trait
     public String parseString(String text, Integer slot)
     {
         String colored_text = text;
-        for (ChatColor color : ChatColor.values())
+
+        int c = 0;
+        while(colored_text.contains("%") && c < 10)
         {
-            String color_code = "%"+color.name().toLowerCase();
-            if (text.contains(color_code))
+            for (ChatColor color : ChatColor.values())
             {
+                String color_code = "%"+color.name().toLowerCase();
                 colored_text = colored_text.replaceAll(color_code, color.toString());
             }
+
+            colored_text = colored_text.
+                    replaceAll("%price",     String.valueOf(get_raw_price(slot))).
+                    replaceAll("%fdmat",     get_formatted_d_mat(slot)).
+                    replaceAll("%fimat",     get_formatted_i_mat(slot)).
+                    replaceAll("%imat",      get_item_material(slot)).
+                    replaceAll("%dmat",      get_disp_material(slot)).
+                    replaceAll("%dname",     ""+get_disp_name(slot)).
+                    replaceAll("%iname",     "" + get_item_name(slot)).
+                    replaceAll("%name",      trader_name).
+                    replaceAll("%slot",      String.valueOf(slot)).
+                    replaceAll("%inv",       inv_name).
+                    replaceAll("%group",     group).
+                    replaceAll("%npcname",   npc.getName());
+            c ++;
         }
-        return colored_text.
-                replaceAll("%price",     String.valueOf(get_raw_price(slot))).
-                replaceAll("%imat",      get_item_material(slot)).
-                replaceAll("%dmat",      get_disp_material(slot)).
-                replaceAll("%dname",     get_disp_name(slot)).
-                replaceAll("%iname",     get_item_name(slot)).
-                replaceAll("%name",      trader_name).
-                replaceAll("%slot",      String.valueOf(slot)).
-                replaceAll("%inv",       inv_name).
-                replaceAll("%group",     group).
-                replaceAll("%npcname",   npc.getName());
+        return colored_text;
 
     }
 
     public String parseString(String text, Integer slot, Player player)
     {
         String colored_text = text;
-        for (ChatColor color : ChatColor.values())
+
+        int c = 0;
+        while(colored_text.contains("%") && c < 10)
         {
-            String color_code = "%"+color.name().toLowerCase();
-            if (text.contains(color_code))
+            for (ChatColor color : ChatColor.values())
             {
+                String color_code = "%"+color.name().toLowerCase();
                 colored_text = colored_text.replaceAll(color_code, color.toString());
             }
+
+            colored_text = colored_text.
+                    replaceAll("%rawprice", String.valueOf(get_raw_price(slot))).
+                    replaceAll("%fimat", get_formatted_i_mat(slot)).
+                    replaceAll("%fdmat", get_formatted_d_mat(slot)).
+                    replaceAll("%price", String.valueOf(get_price(slot, player))).
+                    replaceAll("%imat", get_item_material(slot)).
+                    replaceAll("%dmat", get_disp_material(slot)).
+                    replaceAll("%dname", "" + get_disp_name(slot)).
+                    replaceAll("%iname", ""+get_item_name(slot)).
+                    replaceAll("%name", trader_name).
+                    replaceAll("%slot", String.valueOf(slot)).
+                    replaceAll("%inv", inv_name).
+                    replaceAll("%group", group).
+                    replaceAll("%npcname", npc.getName()).
+                    replaceAll("%karma", String.valueOf(PlayerKarmaManager.getPlayerKarma(player)));
+            c++;
         }
-        return colored_text.
-                replaceAll("%rawprice",  String.valueOf(get_raw_price(slot))).
-                replaceAll("%price",     String.valueOf(get_price(slot, player))).
-                replaceAll("%imat",      get_item_material(slot)).
-                replaceAll("%dmat",      get_disp_material(slot)).
-                replaceAll("%dname",     get_disp_name(slot)).
-                replaceAll("%iname",     get_item_name(slot)).
-                replaceAll("%name",      trader_name).
-                replaceAll("%slot",      String.valueOf(slot)).
-                replaceAll("%inv",       inv_name).
-                replaceAll("%group",     group).
-                replaceAll("%npcname",   npc.getName()).
-                replaceAll("%karma",     String.valueOf(PlayerKarmaManager.getPlayerKarma(player)));
+        return colored_text;
+    }
+
+    private String get_formatted_d_mat(Integer slot)
+    {
+        String mat = get_disp_material(slot);
+        mat = mat.replace("_", " ");
+        return mat;
+    }
+
+    private String get_formatted_i_mat(Integer slot)
+    {
+        String mat = get_item_material(slot);
+        mat = mat.replace("_", " ");
+        return mat;
     }
 
     public ArrayList<String> parseLore(ArrayList<String>lore, Integer slot)
@@ -471,9 +513,9 @@ public class Trader extends Trait
         if (event.getNPC() == this.getNPC())
         {
             // DISPLAY INVENTORY WITH "DISPLAY" ITEMS
-            trader_GUI = Bukkit.createInventory(null, 54, parseString(inv_name, 0));
+            trader_GUI = Bukkit.createInventory(null, gui_size, parseString(inv_name, 0));
 
-            for (Integer slot = 0; slot<max_gui_size; slot++)
+            for (Integer slot = 0; slot< gui_size; slot++)
             {
                 if (disp_materials.containsKey(slot))
                 {
@@ -530,10 +572,16 @@ public class Trader extends Trait
         }
         else
         {
+            String trader_prefix = ChatColor.WHITE + "[L] [" + parseString(trader_name, 0, player) + ChatColor.WHITE + "] " + ChatColor.DARK_GRAY + ">> " + ChatColor.RESET;
+
+
+
             if (event.getClickedInventory() == trader_GUI)
             {
                 Integer slot = event.getSlot();
                 ItemStack clicked_item = event.getCurrentItem();
+
+
 
                 if (clicked_item==null || clicked_item.getType() == Material.AIR)
                 {
@@ -541,6 +589,11 @@ public class Trader extends Trait
                     return;
                 }
 
+                String name = clicked_item.getItemMeta().getDisplayName();
+                if (name==null || name.equals(""))
+                {
+                    name = get_formatted_i_mat(slot);
+                }
 
                 if (this.mode.equals("sell"))
                 {
@@ -549,15 +602,15 @@ public class Trader extends Trait
                     if (event.getClick().isShiftClick())
                     {
                         item_to_give.setAmount(64);
-                        player.sendMessage("Вы приобрели 64 " + parseString(item_to_give.getItemMeta().getDisplayName(), slot));
-                        player.sendMessage("деньги не прикрутил, потрачено " + get_price(slot, player) * 64);
+                        player.sendMessage(trader_prefix + "Вы приобрели 64 " + name);
+                        player.sendMessage(trader_prefix + "деньги не прикрутил, потрачено " + get_price(slot, player) * 64);
                         PlayerKarmaManager.updatePlayerKarma(player, get_raw_price(slot)*64);
                     }
                     else
                     {
                         item_to_give.setAmount(1);
-                        player.sendMessage("you bought " + parseString(item_to_give.getItemMeta().getDisplayName(), slot));
-                        player.sendMessage("деньги не прикрутил, потрачено " + get_price(slot, player));
+                        player.sendMessage(trader_prefix + "Вы приобрели " + name);
+                        player.sendMessage(trader_prefix + "деньги не прикрутил, потрачено " + get_price(slot, player));
                         PlayerKarmaManager.updatePlayerKarma(player, get_raw_price(slot));
                     }
 
@@ -573,9 +626,12 @@ public class Trader extends Trait
                             amount += item.getAmount();
                         }
                     }
+
+
+
                     if (amount == 0)
                     {
-                        player.sendMessage("you don't have any " + clicked_item.getItemMeta().getDisplayName());
+                        player.sendMessage(trader_prefix + "У вас нет " + name);
                         event.setCancelled(true);
                         return;
                     }
@@ -583,25 +639,37 @@ public class Trader extends Trait
                     if (event.getClick().isShiftClick() || amount <= 64)
                     {
                         take_item(player.getInventory(), clicked_item.getType(), amount);
-                        player.sendMessage("sold " + amount + " of " + parseString(clicked_item.getItemMeta().getDisplayName(), slot) + " for " + get_price(slot, player)*amount + "$");
-                        player.sendMessage("деньги не прикрутил, получено " +  get_price(slot, player)*amount);
+
+                        player.sendMessage(trader_prefix + "Продано " + amount + " " +  name  + ChatColor.RESET + " за " + get_price(slot, player)*amount + "$");
+                        player.sendMessage(trader_prefix + "деньги не прикрутил, получено " +  get_price(slot, player)*amount);
                     }
                     else
                     {
                         take_item(player.getInventory(), clicked_item.getType(), 64);
-                        player.sendMessage("sold " + 64 + " of " + parseString(clicked_item.getItemMeta().getDisplayName(), slot) + " for " + get_price(slot, player)*64 + "$");
-                        player.sendMessage("деньги не прикрутил, получено " +  get_price(slot, player)*64);
+                        player.sendMessage(trader_prefix + "Продано " + 64 + " " + name + ChatColor.RESET + " за " + get_price(slot, player)*64 + "$");
+                        player.sendMessage(trader_prefix + "деньги не прикрутил, получено " +  get_price(slot, player)*64);
                     }
                 }
                 event.setCancelled(true);
             }
         }
     }
-
+    public boolean mat_is_legit(String s)
+    {
+        for (Material m : Material.values())
+        {
+            if (m.toString().equals(s))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
     public ItemStack create_item_for_sale(ItemStack clicked, Integer slot, Player player)
     {
         ItemStack item_to_give;
-        if (get_item_material(slot)!=null && !get_item_material(slot).equals("air") && !get_item_material(slot).equals(""))
+
+        if (get_item_material(slot)!=null && !get_item_material(slot).equals("air") && !get_item_material(slot).equals("") && mat_is_legit(get_item_material(slot).toUpperCase()))
         {
             item_to_give = new ItemStack(Material.valueOf(get_item_material(slot).toUpperCase()), 1);
         }
@@ -655,7 +723,10 @@ public class Trader extends Trait
     {
         Player player = (Player)event.getPlayer();
         if (edited_by == player)
+        {
             this.edited_by = null;
+            player.sendMessage("Вы больше не можете редактировать этот инвентарь");
+        }
     }
 
     // Called every tick

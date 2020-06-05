@@ -39,15 +39,30 @@ public class PlayerKarmaManager
 
     public static Integer getPlayerKarma(Player player)
     {
-        return CustomRaids.config.load("Karma." + player.getUniqueId());
+        return (Integer) CustomRaids.config.load("Karma." + player.getUniqueId());
     }
-    public static void updatePlayerKarma(Player player, Integer value){
-        Integer karma = getPlayerKarma(player) + value;
-        CustomRaids.config.save("Karma." + player.getUniqueId(), karma);
-
+    public static Integer updatePlayerKarma(Player player, Integer value){
+        Integer karma = getPlayerKarma(player);
+        // round value to medium karma lvl
+        Integer to_add = value;//(int)Math.sqrt(value * karma);
+        setPlayerKarma(player, value, true);
         if (value > 0)
-            player.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_GREEN + "+" + value + " karma");
+            player.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_GREEN + "+" + to_add + " karma");
         if (value < 0)
-            player.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_RED + "-" + value + " karma");
+            player.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_RED + "-" + to_add + " karma");
+        return to_add;
+    }
+
+
+    private static void setPlayerKarma(Player player, Integer value, boolean update)
+    {
+        if (update)
+        {
+            Integer karma = getPlayerKarma(player) + value;
+            CustomRaids.config.save("Karma." + player.getUniqueId(), karma);
+            return;
+        }
+        CustomRaids.config.save("Karma." + player.getUniqueId(), value);
+
     }
 }

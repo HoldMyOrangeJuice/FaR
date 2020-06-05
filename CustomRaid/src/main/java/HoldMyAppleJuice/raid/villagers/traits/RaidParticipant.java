@@ -31,10 +31,9 @@ public class RaidParticipant extends Trait
 
     CustomRaids plugin = null;
     public Location anchor = null;
-    public String participant_name = "default name";
+    public String participant_name = null;
     public boolean dead = false;
 
-    public boolean raid_participant = true;
 
     // see the 'Persistence API' section
     //@Persist("trader_raid_participant") boolean automaticallyPersistedSetting = false;
@@ -45,10 +44,9 @@ public class RaidParticipant extends Trait
     // This is called BEFORE onSpawn, npc.getBukkitEntity() will return null.
     public void load(DataKey key) {
         //SomeSetting = key.getBoolean("SomeSetting", false);
-        dead = key.getBoolean("dead");
-        participant_name = key.getString("participant_name", "default name");
+        dead = key.getBoolean("dead", false);
+        participant_name = key.getString("participant_name", null);
         anchor = new Location(Bukkit.getWorld(key.getString("anchor_w")), key.getInt("anchor_x"), key.getInt("anchor_y"), key.getInt("anchor_z"));
-
 
         if (dead)
         {
@@ -56,11 +54,11 @@ public class RaidParticipant extends Trait
             respawn();
         }
 
+
     }
 
     // Save settings for this NPC (optional). These values will be persisted to the Citizens saves file
     public void save(DataKey key) {
-        key.setBoolean("raid_participant", raid_participant);
         key.setBoolean("dead", dead);
         key.setString("participant_name", participant_name);
         key.setInt("anchor_x", anchor.getBlockX());
@@ -102,7 +100,11 @@ public class RaidParticipant extends Trait
     @Override
     public void onSpawn() {
 
-        participant_name = npc.getName();
+        if (participant_name == null || participant_name.equals(""))
+        {
+            participant_name = npc.getName();
+        }
+
 
         npc.setProtected(false);
 
@@ -122,11 +124,6 @@ public class RaidParticipant extends Trait
     public void npcdamage(NPCDamageByEntityEvent event)
     {
         if (event.getNPC()!=npc) return;
-        //boolean damager_is_npc = CitizensAPI.getNPCRegistry().isNPC(event.getDamager());
-        //boolean damager_is_projectile = (event.getDamager() instanceof Projectile);
-
-        //boolean proj_source_is_ent = (((Projectile)event.getDamager()).getShooter() instanceof Entity);
-        //boolean proj_source_is_npc = CitizensAPI.getNPCRegistry().isNPC( (Entity) ((Projectile)(event.getDamager())).getShooter());
 
         if (!CitizensAPI.getNPCRegistry().isNPC(event.getDamager())
                 && !((event.getDamager() instanceof Projectile)
@@ -141,7 +138,6 @@ public class RaidParticipant extends Trait
         {
             if (((LivingEntity)npc.getEntity()).getHealth()-event.getDamage()<=0)
             {
-                npc.setName(ChatColor.BLACK + "dead");
                 NPC killer = CitizensAPI.getNPCRegistry().getNPC(event.getDamager());
                 //Collection<Player> players_nearby = PlayerKarmaManager.getPlayersNearby(killer.getEntity().getLocation(), 100);
             }
@@ -158,7 +154,9 @@ public class RaidParticipant extends Trait
     {
         if (event.getEntity() != npc.getEntity())return;
         LivingEntity entity = (LivingEntity)event.getEntity();
-        set_name_health(entity.getHealth(), entity.getMaxHealth(), event.getDamage());
+        if (!event.isCancelled()) {
+            set_name_health(entity.getHealth(), entity.getMaxHealth(), event.getDamage());
+        }
     }
 
     @EventHandler
@@ -175,8 +173,6 @@ public class RaidParticipant extends Trait
     {
         if (event.getNPC() == npc)
         {
-            Bukkit.getServer().broadcastMessage("raid participant died");
-            Bukkit.getServer().broadcastMessage("respawning at x " + anchor.getBlockX() + " y "+ anchor.getBlockY() + " z "+ anchor.getBlockZ() + " ");
             dead = true;
             respawn();
         }
@@ -185,10 +181,18 @@ public class RaidParticipant extends Trait
     public void set_name_health(Double health, Double max_health, Double damage)
     {
         String name = "";
-        for (int i = 0; i<health-damage; i ++)
+        if ((health-damage) > 0)
         {
-            name = name.concat("❤");
+            for (int i = 0; i<(health-damage)/2; i ++)
+            {
+                name = name.concat("❤");
+            }
         }
+        else
+        {
+            name = participant_name;
+        }
+
         if (health-damage<max_health/3d)
             npc.setName("" + ChatColor.DARK_RED + name);
         else if (health-damage<max_health/2d)
@@ -203,7 +207,9 @@ public class RaidParticipant extends Trait
         {
             Bukkit.getServer().broadcastMessage("respawning...");
             npc.spawn(anchor);
+            Bukkit.getServer().broadcastMessage("respawnded at " + anchor + " name " + participant_name);
             npc.setName(participant_name);
+
             dead = false;
         }
         else

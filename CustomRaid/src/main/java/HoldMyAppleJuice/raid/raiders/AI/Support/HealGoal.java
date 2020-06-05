@@ -75,8 +75,6 @@ public class HealGoal implements Goal {
             raiders_close.remove(n);
         }
 
-
-        Bukkit.getServer().broadcastMessage("\n\nclose raiders " + raiders_close + "in range " + radius);
         if (raiders_close.size() > 0)
         {
             NPC best = raiders_close.get(0);
@@ -93,8 +91,6 @@ public class HealGoal implements Goal {
 
 
                 Double coef = health_lost_part * distance;
-
-                Bukkit.getServer().broadcastMessage("npc " + raider.getId() + " has coef " + coef + " ( " + health_lost_part + " " + distance  + " )");
 
                 if (coef >= best_coef)
                 {
@@ -154,7 +150,7 @@ public class HealGoal implements Goal {
             Double health_lost = max_health - actual_health;
             entity.setHealth(actual_health + health_lost * 0.5);
 
-            mate.setName("HP: " + Math.floor(entity.getHealth()));
+            mate.setName( RaidManager.getRaiderType(mate).get_name() + " HP: " + (Math.floor(entity.getHealth())<0?0:Math.floor(entity.getHealth())));
             entity.playEffect(EntityEffect.ENTITY_POOF);
 
 

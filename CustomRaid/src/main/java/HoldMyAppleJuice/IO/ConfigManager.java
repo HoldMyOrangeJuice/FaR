@@ -28,11 +28,9 @@ public class ConfigManager
 
     }
 
-    public Integer load(String path)
+    public Object load(String path)
     {
-        if (conf.get(path) instanceof Integer)
-            return (Integer) conf.get(path);
-        return 0;
+        return conf.get(path);
     }
 
 }

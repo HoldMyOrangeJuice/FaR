@@ -1,6 +1,7 @@
 package HoldMyAppleJuice.comamnds;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -17,19 +18,25 @@ public class CTraiderAutocomplete implements TabCompleter {
     {
         ArrayList<String> list = new ArrayList<String>();
 
+        if (!(sender instanceof Player)) return null;
+        Player player = (Player)sender;
+        if (!player.isOp())
+        {
+            return null;
+        }
         if (args.length == 1)
         {
-            return suggest(args[0], "set", "get", "mode", "group", "make", "edit", "invname", "name");
+            return suggest(args[0], "set", "get", "mode", "group", "make", "edit");
         }
         if (args.length == 2)
         {
             if (args[0].equals("set"))
             {
-                return suggest(args[1], "disp", "item", "price");
+                return suggest(args[1], "disp", "item", "price", "name", "invname", "group", "karma-dependent");
             }
             if (args[0].equals("get"))
             {
-                return suggest(args[1], "disp", "item", "price", "layout");
+                return suggest(args[1], "disp", "item", "price", "layout", "name", "invname", "group");
             }
             if (args[0].equals("mode"))
             {

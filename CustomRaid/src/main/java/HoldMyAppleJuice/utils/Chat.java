@@ -61,7 +61,7 @@ public class Chat
             }
         }
 
-        msg = msg + " | ";
+        //msg = msg + " | ";
 
         TextComponent message = new TextComponent( msg );
         message.setClickEvent( new ClickEvent( ClickEvent.Action.SUGGEST_COMMAND, autocomplete.replaceAll("~", String.valueOf(slot)) ) );

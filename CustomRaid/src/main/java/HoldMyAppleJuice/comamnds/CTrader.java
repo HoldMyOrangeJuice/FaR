@@ -3,7 +3,6 @@ package HoldMyAppleJuice.comamnds;
 import HoldMyAppleJuice.raid.villagers.traits.Trader;
 import HoldMyAppleJuice.utils.Chat;
 import HoldMyAppleJuice.utils.ChatPrefix;
-import com.sun.java.swing.plaf.windows.WindowsTextAreaUI;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Bukkit;
@@ -11,7 +10,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -24,14 +22,35 @@ public class CTrader implements CommandExecutor
     public boolean onCommand(CommandSender sender, Command command, String label, String[] arguments_raw)
     {
         String[] args = handle_args(arguments_raw);
-        Bukkit.getServer().broadcastMessage("raw "+ Arrays.toString(arguments_raw) + " processed " + Arrays.toString(args));
+        //Bukkit.getServer().broadcastMessage("raw "+ Arrays.toString(arguments_raw) + " processed " + Arrays.toString(args));
 
-        player = sender.getServer().getPlayer(sender.getName());
+
+        if (sender instanceof Player)
+        {
+            player = (Player) sender;
+        }
+        else
+        {
+            return false;
+        }
+
+        if (!player.isOp())
+        {
+            player.sendMessage(ChatColor.RED + "У вас недостаточно прав, что бы сделать это!");
+            return false;
+        }
+
         selectedNPC = CitizensAPI.getDefaultNPCSelector().getSelected(sender);
-        if (selectedNPC.hasTrait(Trader.class))
+        if (selectedNPC!=null && selectedNPC.hasTrait(Trader.class))
             traderTrait = selectedNPC.getTrait(Trader.class);
         else
+        {
             traderTrait = null;
+            player.sendMessage(ChatColor.RED + "Сначала выберите NPC с trait trader" + ChatColor.AQUA + " /npc sel");
+            return false;
+        }
+
+
 
         if (args.length>0 && args[0].equals("parse"))
         {
@@ -49,7 +68,7 @@ public class CTrader implements CommandExecutor
             if (args.length>1 && args[1].equals("remove"))
             {
                 Chat.message(ChatPrefix.TRADER_INFO, player, "removed npc from", traderTrait.group);
-                traderTrait.group = null;
+                traderTrait.group = String.valueOf(Math.random());
             }
         }
 
@@ -71,23 +90,17 @@ public class CTrader implements CommandExecutor
             if (args.length>1 && args[1].equals("sell"))
             {
                 traderTrait.mode = "sell";
-                Chat.message(ChatPrefix.TRADER_INFO, player, "now mode is sell");
+                traderTrait.update_group_inventory();
+                Chat.message(ChatPrefix.TRADER_INFO, player, "Установлен режим продажи");
             }
             else if (args[1].equals("buy"))
             {
                 traderTrait.mode = "buy";
+                traderTrait.update_group_inventory();
+                Chat.message(ChatPrefix.TRADER_INFO, player, "Установлен режим скупки");
             }
         }
 
-        if (args.length>0 && args[0].equals("invname"))
-        {
-            traderTrait.inv_name = args[1];
-        }
-
-        if (args.length>0 && args[0].equals("name"))
-        {
-            traderTrait.trader_name = args[1];
-        }
 
         if (args.length>0 && args[0].equals("get"))
         {
@@ -131,6 +144,16 @@ public class CTrader implements CommandExecutor
                     player.sendMessage(ChatColor.GOLD + "base price is " + price);
                 }
             }
+            if (args.length>1 && args[1].equals("name"))
+            {
+                player.sendMessage("Имя торговца - " + traderTrait.trader_name);
+            }
+
+            if (args.length>1 && args[1].equals("invname"))
+            {
+                player.sendMessage("Название инвентаря - " + traderTrait.inv_name);
+            }
+
             if (args.length>1 && args[1].equals("layout"))
             {
                 Chat.message(ChatPrefix.TRADER_INFO, player, "Layout:");
@@ -138,13 +161,17 @@ public class CTrader implements CommandExecutor
 
                 if (args.length>2 )
                 {
-                    print_lore(Integer.parseInt(args[2]));
+                    print_layout(Integer.parseInt(args[2]));
                 }
                 else
                 {
-                    print_lore(null);
+                    print_layout(null);
                 }
 
+            }
+            if (args.length>1 && args[1].equals("group"))
+            {
+                player.sendMessage("Торговец находится в группе " + traderTrait.group);
             }
         }
         if (args.length>0 && args[0].equals("set"))
@@ -159,11 +186,11 @@ public class CTrader implements CommandExecutor
         return true;
     }
 
-    public void print_lore(Integer row)
+    public void print_layout(Integer row)
     {
 
         Integer start_slot = 0;
-        Integer end_slot = 53;
+        Integer end_slot = traderTrait.gui_size;
         if (row!=null)
         {
             start_slot = row*9;
@@ -216,10 +243,32 @@ public class CTrader implements CommandExecutor
                     if (arg2.equals("mat"))
                         traderTrait.set_disp_material(Integer.valueOf(arg3), arg4);
                     if (arg2.equals("name"))
-                        traderTrait.set_disp_name(Integer.valueOf(arg3), arg4);
+                        if (arg3.equals("all"))
+                        {
+                            for (int slot = 0; slot < traderTrait.gui_size; slot ++)
+                            {
+                                traderTrait.set_disp_name(slot, arg4);
+                            }
+                        }
+                        else
+                        {
+                            traderTrait.set_disp_name(Integer.valueOf(arg3), arg4);
+                        }
+
                     if (arg2.equals("lore"))
                     {
-                        traderTrait.set_disp_lore(Integer.valueOf(arg3), values);
+                        if (arg3.equals("all"))
+                        {
+                            for (int slot = 0; slot < traderTrait.gui_size; slot ++)
+                            {
+                                traderTrait.set_disp_lore(slot, values);
+                            }
+                        }
+                        else
+                        {
+                            traderTrait.set_disp_lore(Integer.valueOf(arg3), values);
+                        }
+
                     }
                 }
                 else
@@ -227,6 +276,18 @@ public class CTrader implements CommandExecutor
                     Chat.message(ChatPrefix.TRADER_ERROR, player, "mode can't be null.");
                 }
 
+            }
+            if (arg1.equals("karma-dependent"))
+            {
+                if (arg2 != null)
+                {
+                    traderTrait.karma_dependent = (arg2.toLowerCase().equals("true"));
+                    player.sendMessage("Зависимость от репутации " + traderTrait.karma_dependent);
+                }
+                else
+                {
+                    player.sendMessage("Неверный аргумент");
+                }
             }
             if (arg1.equals("item"))
             {
@@ -238,6 +299,15 @@ public class CTrader implements CommandExecutor
                         traderTrait.set_item_name(Integer.valueOf(arg3), arg4);
                     if (arg2.equals("lore"))
                     {
+                        if (arg3==null)return;
+
+                        if (arg3.equals("all"))
+                        {
+                            for (int slot = 0; slot < traderTrait.gui_size; slot ++)
+                            {
+                                traderTrait.set_item_lore(slot, values);
+                            }
+                        }
                         traderTrait.set_item_lore(Integer.valueOf(arg3), values);
                     }
                 }
@@ -266,8 +336,36 @@ public class CTrader implements CommandExecutor
             }
             if (update_layout)
             {
-                print_lore((int)Math.floor(Integer.valueOf(arg3) / 9d));
+
+                print_layout((int)Math.floor(Integer.parseInt(arg2) / 9d));
             }
+
+            if (args.length>1 && arg1.equals("name"))
+            {
+                if (arg2==null)return;
+                traderTrait.trader_name = arg2;
+                player.sendMessage("Имя торговца изменено на " + traderTrait.trader_name);
+            }
+
+            if (args.length>1 && arg1.equals("invname"))
+            {
+                if (arg2==null)return;
+                traderTrait.inv_name = arg2;
+                player.sendMessage("Название инвентаря изменено на " + traderTrait.inv_name);
+            }
+            if (args.length>1 && arg1.equals("size"))
+            {
+                if (arg2==null)return;
+                int size = Integer.parseInt(arg2) - Integer.parseInt(arg2) % 9;
+                if (size > 0 && size < 55)
+                {
+                    traderTrait.gui_size = size;
+                    player.sendMessage("Размер инвентаря изменен на " + traderTrait.gui_size);
+                    return;
+                }
+                player.sendMessage("Неверное значение " + size);
+            }
+
         }
         else
         {
@@ -275,6 +373,57 @@ public class CTrader implements CommandExecutor
         }
 
     }
+
+    public void handle_get(Player sender, Integer start_index, String[] args)
+    {
+        String arg0;
+        String arg1;
+        String arg2;
+
+        if (args.length-start_index > 0) {
+             arg0 = args[0];
+        }
+        else
+        {
+            arg0 = null;
+        }
+        if (args.length-start_index > 1) {
+             arg1 = args[1];
+        }
+        else
+        {
+            arg1 = null;
+        }
+        if (args.length-start_index > 2) {
+             arg2 = args[3];
+        }
+        else
+        {
+            arg2 = null;
+        }
+
+        if (arg0.equals("price"))
+        {
+            sender.sendMessage("price is");
+        }
+        if (arg0.equals("disp"))
+        {
+
+        }
+        if (arg0.equals("item"))
+        {
+
+        }
+        if (arg0.equals("layout"))
+        {
+
+        }
+
+
+    }
+
+
+
 
     public static String[] handle_args(String[] args)
     {

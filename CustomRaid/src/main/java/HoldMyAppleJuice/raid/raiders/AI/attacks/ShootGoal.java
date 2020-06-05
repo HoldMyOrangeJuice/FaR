@@ -36,8 +36,6 @@ public class ShootGoal implements RaiderAttackGoal {
 
     public void run(GoalSelector goalSelector) {
 
-
-
         if (raider.getNavigator().isNavigating() && victim.isSpawned() && raider.getEntity().getLocation().distance(victim.getEntity().getLocation())>10)
         {
             // everything fine, keep going
