@@ -4,6 +4,8 @@ import HoldMyAppleJuice.CustomRaids;
 import HoldMyAppleJuice.raid.managers.PlayerKarmaManager;
 import HoldMyAppleJuice.utils.Chat;
 import HoldMyAppleJuice.utils.ChatPrefix;
+import com.sun.deploy.util.OrderedHashSet;
+import jdk.nashorn.internal.runtime.ECMAException;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.event.NPCRightClickEvent;
 import net.citizensnpcs.api.npc.NPC;
@@ -23,6 +25,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -427,6 +430,7 @@ public class Trader extends Trait
                     replaceAll("%npcname",   npc.getName());
             c ++;
         }
+        colored_text = parse_logic(colored_text);
         return colored_text;
 
     }
@@ -461,6 +465,7 @@ public class Trader extends Trait
                     replaceAll("%karma", String.valueOf(PlayerKarmaManager.getPlayerKarma(player)));
             c++;
         }
+        colored_text = parse_logic(colored_text);
         return colored_text;
     }
 
@@ -602,19 +607,40 @@ public class Trader extends Trait
                     if (event.getClick().isShiftClick())
                     {
                         item_to_give.setAmount(64);
-                        player.sendMessage(trader_prefix + "Вы приобрели 64 " + name);
-                        player.sendMessage(trader_prefix + "деньги не прикрутил, потрачено " + get_price(slot, player) * 64);
-                        PlayerKarmaManager.updatePlayerKarma(player, get_raw_price(slot)*64);
+
+                        if (CustomRaids.econ.has(player, get_price(slot, player) * 64))
+                        {
+                            CustomRaids.econ.depositPlayer(player, -get_price(slot, player) * 64);
+                            PlayerKarmaManager.updatePlayerKarma(player, get_raw_price(slot)*64);
+                            player.sendMessage(trader_prefix + "Вы приобрели 64 " + name + " за $" + get_price(slot, player)*64);
+                            player.getInventory().addItem(item_to_give);
+                        }
+                        else
+                        {
+                            player.sendMessage(trader_prefix + "У вас недостаточно денег!");
+                        }
+
                     }
                     else
                     {
                         item_to_give.setAmount(1);
-                        player.sendMessage(trader_prefix + "Вы приобрели " + name);
-                        player.sendMessage(trader_prefix + "деньги не прикрутил, потрачено " + get_price(slot, player));
-                        PlayerKarmaManager.updatePlayerKarma(player, get_raw_price(slot));
+                        if (CustomRaids.econ.has(player, get_price(slot, player)))
+                        {
+                            CustomRaids.econ.depositPlayer(player, -get_price(slot, player));
+                            PlayerKarmaManager.updatePlayerKarma(player, get_raw_price(slot));
+                            player.sendMessage(trader_prefix + "Вы приобрели " + name + " за $" + get_price(slot, player));
+                            //player.sendMessage(trader_prefix + "потрачено $" + get_price(slot, player));
+                            PlayerKarmaManager.updatePlayerKarma(player, get_raw_price(slot));
+                            player.getInventory().addItem(item_to_give);
+                        }
+                        else
+                        {
+                            player.sendMessage(trader_prefix + "У вас недостаточно денег!");
+                        }
+
                     }
 
-                    player.getInventory().addItem(item_to_give);
+
                 }
                 else if (this.mode.equals("buy"))
                 {
@@ -626,8 +652,6 @@ public class Trader extends Trait
                             amount += item.getAmount();
                         }
                     }
-
-
 
                     if (amount == 0)
                     {
@@ -641,13 +665,15 @@ public class Trader extends Trait
                         take_item(player.getInventory(), clicked_item.getType(), amount);
 
                         player.sendMessage(trader_prefix + "Продано " + amount + " " +  name  + ChatColor.RESET + " за " + get_price(slot, player)*amount + "$");
-                        player.sendMessage(trader_prefix + "деньги не прикрутил, получено " +  get_price(slot, player)*amount);
+                        //player.sendMessage(trader_prefix + "получено $" +  get_price(slot, player)*amount);
+                        CustomRaids.econ.depositPlayer(player, get_price(slot, player)*amount);
                     }
                     else
                     {
                         take_item(player.getInventory(), clicked_item.getType(), 64);
                         player.sendMessage(trader_prefix + "Продано " + 64 + " " + name + ChatColor.RESET + " за " + get_price(slot, player)*64 + "$");
-                        player.sendMessage(trader_prefix + "деньги не прикрутил, получено " +  get_price(slot, player)*64);
+                        //player.sendMessage(trader_prefix + "получено $" +  get_price(slot, player)*64);
+                        CustomRaids.econ.depositPlayer(player, get_price(slot, player)*64);
                     }
                 }
                 event.setCancelled(true);
@@ -684,9 +710,21 @@ public class Trader extends Trait
             meta.setDisplayName(parseString(get_item_name(slot), slot));
         }
 
-        if (get_item_lore(slot)!=null)
+        if (get_item_lore(slot)!=null && get_item_lore(slot).size() > 0)
         {
-            meta.setLore(parseLore((ArrayList<String>) get_item_lore(slot), slot, player));
+            List<String>lore = new ArrayList<String>();
+            for (String line : get_item_lore(slot))
+            {
+                if (!line.equals(""))
+                {
+                    lore.add(line);
+                }
+            }
+            if (lore.size() > 0)
+            {
+                meta.setLore(parseLore((ArrayList<String>) get_item_lore(slot), slot, player));
+            }
+
         }
         item_to_give.setItemMeta(meta);
         return item_to_give;
@@ -786,6 +824,95 @@ public class Trader extends Trait
     public String Dlore_field(Integer slot, Integer line)
     {
         return "lore" + String.valueOf(line) + "_disp_" + String.valueOf(slot);
+    }
+
+    public String parse_logic(String text)
+    {
+        final ArrayList<String> operators = new ArrayList<String>(Arrays.asList("<=", ">=", "<", ">", "=="));
+        ArrayList<Integer> double_quote_index = new ArrayList<Integer>();
+        for (int i = 0; i<text.length(); i++)
+        {
+            char letter = text.toCharArray()[i];
+            if (letter == '$')
+            {
+                double_quote_index.add(i);
+            }
+        }
+        ArrayList<String> scripts = new ArrayList<String>();
+        String script = "";
+        for (int letter_index=0; letter_index<text.length(); letter_index++)
+        {
+
+            char letter = text.charAt(letter_index);
+            for (int pair_index = 1; pair_index <= Math.floor(double_quote_index.size() / 2d); pair_index++) {
+                Integer quote1_idx = double_quote_index.get(pair_index * 2 - 2);
+                Integer quote2_idx = double_quote_index.get(pair_index * 2 - 1);
+
+                if (quote1_idx < letter_index && letter_index < quote2_idx) {
+                    script = script.concat(String.valueOf(letter));
+                }
+                else if (!script.equals(""))
+                {
+                    scripts.add(script);
+                    script = "";
+                }
+            }
+
+        }
+
+        for (int i = 0; i < scripts.size(); i++)
+        {
+            String line = scripts.get(i);
+            //"test > test2?text:text2"
+            if (line.split("\\?").length == 2)
+            {
+                String condition = line.split("\\?")[0];
+                String values = line.split("\\?")[1];
+                if (values.split(":").length ==2)
+                {
+                    String val_true = values.split(":")[0];
+                    String val_false = values.split(":")[1];
+
+                    for (String operator : operators)
+                    {
+                        if (condition.contains(operator))
+                        {
+                            if (condition.split(operator).length == 2)
+                            {
+                                String cond_val_1 = condition.split(operator)[0];
+                                String cond_val_2 = condition.split(operator)[1];
+
+                                try
+                                {
+                                    Integer val1 = Integer.valueOf(cond_val_1);
+                                    Integer val2 = Integer.valueOf(cond_val_2);
+
+                                    if ( (val1.equals(val2) && operator.equals("==")) ||
+                                            (val1 > val2 && operator.equals(">") ) ||
+                                            (val1 >= val2 && operator.equals(">=") ) ||
+                                            (val1 <= val2 && operator.equals("<=") ) ||
+                                            (val1 < val2 && operator.equals("<") ) )
+                                    {
+                                        line = line.replaceAll("\\$", "");
+                                        text = text.replace(line, val_true);
+
+                                    }
+                                    else
+                                    {
+                                        line = line.replaceAll("\\$", "");
+                                        text = text.replace(line, val_false);
+                                    }
+                                }catch (Exception e)
+                                {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return text.replaceAll("\\$", "");
     }
 
 }

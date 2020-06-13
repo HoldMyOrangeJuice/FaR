@@ -6,8 +6,11 @@ import HoldMyAppleJuice.raid.managers.RaidManager;
 import HoldMyAppleJuice.raid.raiders.traits.*;
 import HoldMyAppleJuice.raid.villagers.traits.Trader;
 import net.citizensnpcs.api.CitizensAPI;
+import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.permission.Permission;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import HoldMyAppleJuice.raid.villagers.traits.RaidParticipant;
 
@@ -18,6 +21,8 @@ public class CustomRaids extends JavaPlugin
     public static CustomRaids plugin;
     public static ConfigManager config;
     public final static RaidManager listener = new RaidManager();
+    public static Economy econ = null;
+    public static Permission perms = null;
 
     public CustomRaids()
     {
@@ -54,6 +59,25 @@ public class CustomRaids extends JavaPlugin
 
         // actually crunch
         getServer().getPluginManager().registerEvents(listener, this);
+
+        setupEconomy();
+    }
+
+    private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null)
+        {
+            System.out.println("no vault detected");
+            return false;
+        }
+        System.out.println("vault detected");
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            System.out.println("economy not detected");
+            return false;
+        }
+        econ = rsp.getProvider();
+        System.out.println("economy detected " + econ);
+        return econ != null;
     }
 
 }

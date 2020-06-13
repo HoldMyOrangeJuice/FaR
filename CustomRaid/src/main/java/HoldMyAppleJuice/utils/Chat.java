@@ -27,7 +27,7 @@ public class Chat
             message = message.concat(part).concat(" ");
         }
 
-        player.sendMessage(prefix.text + message);
+        player.sendMessage(prefix.text + " " + message);
     }
 
     public static void message(Iterable<Player>players, String ... args)

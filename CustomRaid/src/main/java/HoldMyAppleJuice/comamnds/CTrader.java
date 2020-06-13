@@ -1,5 +1,6 @@
 package HoldMyAppleJuice.comamnds;
 
+import HoldMyAppleJuice.CustomRaids;
 import HoldMyAppleJuice.raid.villagers.traits.Trader;
 import HoldMyAppleJuice.utils.Chat;
 import HoldMyAppleJuice.utils.ChatPrefix;
@@ -50,24 +51,99 @@ public class CTrader implements CommandExecutor
             return false;
         }
 
+        if (args[0].equals("bal"))
+        {
+            player.sendMessage("balance: " + CustomRaids.econ.getBalance(player));
+        }
 
+        if (args[0].equals("help"))
+        {
+            if (args.length == 1 || args[1].equals("1"))
+            {
+                player.sendMessage("/trader help 2 следующая страница");
+                player.sendMessage("/trader [set] [disp] [mat] [slot] [material here]");
+                player.sendMessage("/trader [set] [disp] [name] [slot] [name here]");
+                player.sendMessage("/trader [set] [disp] [lore] [slot] [lore] (lore) (lore)...");
+
+                player.sendMessage("/trader [set] [price] [slot] [price here]");
+                player.sendMessage("/trader [set] [karma-dependent] [true/false]");
+
+                player.sendMessage("/trader [set] [item] [name] [slot] [material here]");
+                player.sendMessage("/trader [set] [item] [lore] [slot] [name here]");
+                player.sendMessage("/trader [set] [item] [mat] [slot] [lore] (lore) (lore)...");
+
+                player.sendMessage("/trader [get] [disp] [mat] [slot]");
+                player.sendMessage("/trader [get] [disp] [name] [slot]");
+                player.sendMessage("/trader [get] [disp] [lore] [slot]");
+
+                player.sendMessage("/trader [get] [item] [mat] [slot]");
+                player.sendMessage("/trader [get] [item] [name] [slot]");
+                player.sendMessage("/trader [get] [item] [lore] [slot]");
+
+                player.sendMessage("/trader [get] [price] [slot]");
+                player.sendMessage("/trader [get] [layout]");
+                player.sendMessage("/trader [get] [name]");
+                player.sendMessage("/trader [get] [invname]");
+                player.sendMessage("/trader [parse] [text] [slot]");
+            }
+
+            if (args[1].equals("2"))
+            {
+                player.sendMessage("/trader help 3 следующая страница");
+                player.sendMessage("if синтаксис:" +
+                        "\n$var1 operator var2?var_true:var_false$\n" +
+                        "var1 - переменная, число, которое будет сравниваться с var2.\n" +
+                        "var2 - переменная, число, которое будет сравниваться с var1.\n" +
+                        "var_true - переменная, строка, будет возвращена вместо $выражения$, если оно истинно.\n" +
+                        "var_false - переменная, строка, будет возвращена вместо $выражения$, если оно ложно.\n" +
+                        "operator - оператор, строка, возможные операторы: >, <, >=, <=, ==." +
+                        "Пример:\n" +
+                        "\"$%rawprice>%price?%green%price%reset %red%strikethrough%rawprice%reset:%red%price%reset %green%strikethrough%rawprice%reset$\"");
+            }
+            if (args[1].equals("3"))
+            {
+                player.sendMessage("Переменные, поддерживающие парсинг:\n" +
+                        "%rawprice - Цена слота без учета репутации\n" +
+                        "%price - Цена слота с учетом репутации\n" +
+                        "%fimat - formatted item material - строка с названием предмета исходя из материалла в слоте, заменяет _ на \" \". Пока что на английском.\n" +
+                        "%fdmat - formatted display material - строка с названием отображаемого предмета исходя из материалла в слоте, заменяет _ на \" \". Пока что на английском.\n" +
+                        "%imat - название_материалла_в_слоте\n" +
+                        "%dmat - название_отображаемого_материалла_в_слоте\n" +
+                        "%dname - название отображаемого предмета в слоте\n" +
+                        "%iname - название предмета в слоте\n" +
+                        "%name - имя торговца, которое используется для сообщений в чате\n" +
+                        "%slot - слот\n" +
+                        "%inv - название инвентаря\n" +
+                        "%group - группа\n" +
+                        "%npcname - имя NPC\n"
+                );
+            }
+        }
 
         if (args.length>0 && args[0].equals("parse"))
         {
-            player.sendMessage(traderTrait.parseString(args[1], Integer.valueOf(args[2])));
+            player.sendMessage(traderTrait.parseString(args[1], Integer.valueOf(args[2]), player));
         }
 
         if (args.length>0 && args[0].equals("group"))
         {
             if (args.length>1 && args[1].equals("add"))
             {
-                Chat.message(ChatPrefix.TRADER_INFO, player, "added npc to group", args[2]);
-                traderTrait.group = args[2];
-                traderTrait.clone_group_inventory();
+                if (args[2]!=null)
+                {
+                    Chat.message(ChatPrefix.TRADER_INFO, player, "Торговец добавлен к группе", args[2]);
+                    traderTrait.group = args[2];
+                    traderTrait.clone_group_inventory();
+                }
+                else
+                {
+                    Chat.message(ChatPrefix.TRADER_ERROR, player, "Укажите название группы");
+                }
+
             }
             if (args.length>1 && args[1].equals("remove"))
             {
-                Chat.message(ChatPrefix.TRADER_INFO, player, "removed npc from", traderTrait.group);
+                Chat.message(ChatPrefix.TRADER_INFO, player, "Торговец удален из группы", traderTrait.group);
                 traderTrait.group = String.valueOf(Math.random());
             }
         }
@@ -81,7 +157,7 @@ public class CTrader implements CommandExecutor
         if (args.length>0 && args[0].equals("edit"))
         {
             traderTrait.edited_by = player;
-            player.sendMessage("now you can edit npc's inventory");
+            player.sendMessage("Теперь вы можете редактировать инвентарь торговца");
         }
 
 
@@ -108,15 +184,15 @@ public class CTrader implements CommandExecutor
             {
                 if (args.length>2 && args[2].equals("mat"))
                 {
-                    player.sendMessage("material of slot " + args[3] + " is " + traderTrait.get_disp_material(Integer.valueOf(args[3])));
+                    player.sendMessage("Материалл (отображаемый) в слоте " + args[3] + " - " + traderTrait.get_disp_material(Integer.valueOf(args[3])));
                 }
                 if (args.length>2 && args[2].equals("lore"))
                 {
-                    player.sendMessage("lore of slot " + args[3] + " is " + traderTrait.get_disp_lore(Integer.valueOf(args[3])).toString());
+                    player.sendMessage("Описание (отображаемое) слота " + args[3] + " - " + traderTrait.get_disp_lore(Integer.valueOf(args[3])).toString());
                 }
                 if (args.length>2 && args[2].equals("name"))
                 {
-                    player.sendMessage("name of slot " + args[3] + " is " + traderTrait.get_disp_name(Integer.valueOf(args[3])));
+                    player.sendMessage("название (отображаемое)" + args[3] + " - " + traderTrait.get_disp_name(Integer.valueOf(args[3])));
                 }
             }
 
@@ -124,15 +200,15 @@ public class CTrader implements CommandExecutor
             {
                 if (args.length>2 && args[2].equals("mat"))
                 {
-                    player.sendMessage("material of slot " + args[3] + " is " + traderTrait.get_item_material(Integer.valueOf(args[3])));
+                    player.sendMessage("Материалл (предмета) в слоте " + args[3] + " - " + traderTrait.get_item_material(Integer.valueOf(args[3])));
                 }
                 if (args.length>2 && args[2].equals("lore"))
                 {
-                    player.sendMessage("lore of slot " + args[3] + " is " + traderTrait.get_item_lore(Integer.valueOf(args[3])).toString());
+                    player.sendMessage("Описание (предмета) в слоте " + args[3] + " - " + traderTrait.get_item_lore(Integer.valueOf(args[3])).toString());
                 }
                 if (args.length>2 && args[2].equals("name"))
                 {
-                    player.sendMessage("name of slot " + args[3] + " is " + traderTrait.get_item_name(Integer.valueOf(args[3])));
+                    player.sendMessage("Название (предмета) в слоте " + args[3] + " - " + traderTrait.get_item_name(Integer.valueOf(args[3])));
                 }
             }
 
@@ -157,7 +233,7 @@ public class CTrader implements CommandExecutor
             if (args.length>1 && args[1].equals("layout"))
             {
                 Chat.message(ChatPrefix.TRADER_INFO, player, "Layout:");
-                Chat.message(player, ChatColor.BLUE + "" + ChatColor.BOLD + "display:", "material", "lore", "name", "item:", ChatColor.DARK_GREEN + "" + ChatColor.BOLD +"material", "price", "lore", "name");
+                //Chat.message(player, ChatColor.BLUE + "" + ChatColor.BOLD + "display:", "material", "lore", "name", "item:", ChatColor.DARK_GREEN + "" + ChatColor.BOLD +"material", "price", "lore", "name");
 
                 if (args.length>2 )
                 {
@@ -240,9 +316,20 @@ public class CTrader implements CommandExecutor
             {
                 if (arg2 != null)
                 {
+
+                    if (arg3==null)
+                    {
+                        Chat.message(ChatPrefix.TRADER_ERROR, player, "Укажите значение");
+                        return;
+                    }
+
                     if (arg2.equals("mat"))
+                    {
                         traderTrait.set_disp_material(Integer.valueOf(arg3), arg4);
+                        Chat.message(ChatPrefix.TRADER_INFO, player, "Отображаемый материалл установлен", arg4, "для", arg3);
+                    }
                     if (arg2.equals("name"))
+                    {
                         if (arg3.equals("all"))
                         {
                             for (int slot = 0; slot < traderTrait.gui_size; slot ++)
@@ -254,6 +341,8 @@ public class CTrader implements CommandExecutor
                         {
                             traderTrait.set_disp_name(Integer.valueOf(arg3), arg4);
                         }
+                        Chat.message(ChatPrefix.TRADER_INFO, player, "Отображаемое название установлено", arg4, "для", arg3);
+                    }
 
                     if (arg2.equals("lore"))
                     {
@@ -268,12 +357,13 @@ public class CTrader implements CommandExecutor
                         {
                             traderTrait.set_disp_lore(Integer.valueOf(arg3), values);
                         }
+                        Chat.message(ChatPrefix.TRADER_INFO, player, "Отображаемое описание установлено", values.toString(), "для", arg3);
 
                     }
                 }
                 else
                 {
-                    Chat.message(ChatPrefix.TRADER_ERROR, player, "mode can't be null.");
+                    Chat.message(ChatPrefix.TRADER_ERROR, player, "/set disp mat/lore/name");
                 }
 
             }
@@ -293,13 +383,22 @@ public class CTrader implements CommandExecutor
             {
                 if (arg2 != null)
                 {
-                    if (arg2.equals("mat"))
+                    if (arg3==null)
+                    {
+                        Chat.message(ChatPrefix.TRADER_ERROR, player, "Укажите значение");
+                        return;
+                    }
+                    if (arg2.equals("mat")) {
                         traderTrait.set_item_material(Integer.valueOf(arg3), arg4);
-                    if (arg2.equals("name"))
+                        Chat.message(ChatPrefix.TRADER_INFO, player, "Материалл предмета установлен", arg4, "для", arg3);
+                    }
+                    if (arg2.equals("name")){
                         traderTrait.set_item_name(Integer.valueOf(arg3), arg4);
+                        Chat.message(ChatPrefix.TRADER_INFO, player, "Название предмета установлено", arg4, "для", arg3);
+                    }
                     if (arg2.equals("lore"))
                     {
-                        if (arg3==null)return;
+
 
                         if (arg3.equals("all"))
                         {
@@ -309,6 +408,7 @@ public class CTrader implements CommandExecutor
                             }
                         }
                         traderTrait.set_item_lore(Integer.valueOf(arg3), values);
+                        Chat.message(ChatPrefix.TRADER_INFO,player, "Описание предмета установлено", values.toString(), "для", arg3);
                     }
                 }
                 else
@@ -369,7 +469,7 @@ public class CTrader implements CommandExecutor
         }
         else
         {
-            Chat.message(ChatPrefix.TRADER_ERROR, player, "mode can't be null.");
+            Chat.message(ChatPrefix.TRADER_ERROR, player, "/set item mat/lore/name");
         }
 
     }
